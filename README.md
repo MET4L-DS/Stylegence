@@ -1,18 +1,23 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## How to Run the Project
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+2.  **Set up your environment variables:**
+    *   Make sure you have a `.env.local` file with the correct values for your Convex, Clerk, and Razorpay accounts.
+    *   Make sure you have set the `CLERK_JWT_ISSUER_DOMAIN` and `CLERK_WEBHOOK_SECRET` environment variables in your Convex project's dashboard.
+      
+3.  **Start the Convex development server:**
+    ```bash
+    npx convex dev
+    ```
+4.  **Start the Next.js development server:**
+    ```bash
+    npm run dev
+    ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
