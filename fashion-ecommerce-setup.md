@@ -1,4 +1,4 @@
-# Fashion E-commerce Aggregator - Complete Setup Guide
+# Stylegence - Complete Setup Guide
 
 ## Prerequisites
 
@@ -26,7 +26,6 @@ npm install @clerk/backend svix
 npm install body-parser crypto
 ```
 
-- 1. and 2. are done
 ### 3. Environment Variables
 
 Create `.env.local`:
@@ -843,7 +842,6 @@ async function userByExternalId(ctx: QueryCtx, externalId: string) {
 ```
 
 ### Webhook Handler (`convex/http.ts`) 
-- change this in accordance to razorpay
 
 ```typescript
 import { httpRouter } from "convex/server";
