@@ -7,6 +7,8 @@ import { TextEffect } from '@/components/ui/text-effect'
 import { AnimatedGroup } from '@/components/ui/animated-group'
 import { HeroHeader } from './header'
 
+import { AnimationGeneratorType } from 'framer-motion'
+
 const transitionVariants = {
     item: {
         hidden: {
