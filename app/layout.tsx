@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import ConvexClientProvider from "./components/ConvexClientProvider";
 import { Geist, Geist_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
+import { dark, neobrutalism } from '@clerk/themes'
 
 import {
   SignInButton,
@@ -40,7 +41,11 @@ export default function RootLayout({
     <html lang="en" className="dark" style={{colorScheme:"dark"}}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system">
-          <ClerkProvider>
+          <ClerkProvider
+            appearance={{
+              baseTheme: dark,
+            }}
+          >
             <ConvexClientProvider>{children}</ConvexClientProvider>
           </ClerkProvider>
         </ThemeProvider>
