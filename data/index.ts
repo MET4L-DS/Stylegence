@@ -1,11 +1,11 @@
 export * from "./types";
 export * from "./constants";
 export * from "./analytics";
-export { wardrobeItems } from "./wardrobeItems";
+export { wardrobeItems, brands, categories } from "./wardrobeItems";
 export { outfits } from "./outfits";
 export { weeklyPlan } from "./weeklyPlan";
 
-import { wardrobeItems } from "./wardrobeItems";
+import { wardrobeItems, brands, categories } from "./wardrobeItems";
 import { outfits } from "./outfits";
 import { weeklyPlan } from "./weeklyPlan";
 import { WardrobeData } from "./types";
@@ -15,4 +15,6 @@ export const wardrobeData: WardrobeData = {
 	all: wardrobeItems,
 	outfits,
 	weeklyPlan,
+	brands,
+	categories,
 };
