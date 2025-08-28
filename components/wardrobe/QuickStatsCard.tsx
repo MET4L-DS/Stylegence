@@ -1,12 +1,53 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WardrobeData } from "@/data";
-import { Tag, Heart, TrendingUp, Star } from "lucide-react";
+import {
+	Tag,
+	Heart,
+	TrendingUp,
+	Star,
+	DollarSign,
+	Leaf,
+	Clock,
+	Target,
+} from "lucide-react";
 
 interface QuickStatsCardProps {
 	wardrobeItems: WardrobeData;
 }
 
 export function QuickStatsCard({ wardrobeItems }: QuickStatsCardProps) {
+	// Calculate dynamic statistics
+	const totalItems = wardrobeItems.all.length;
+	const totalOutfits = wardrobeItems.outfits.length;
+
+	// Find most worn item
+	const mostWornItem = wardrobeItems.all.reduce((prev, current) => {
+		const prevWears = (prev as any).wearCount || 0;
+		const currentWears = (current as any).wearCount || 0;
+		return currentWears > prevWears ? current : prev;
+	}, wardrobeItems.all[0]);
+
+	// Calculate total wardrobe value
+	const totalValue = wardrobeItems.all.reduce((sum, item) => {
+		return sum + ((item as any).purchasePrice || 0);
+	}, 0);
+
+	// Calculate average cost per wear
+	const totalWears = wardrobeItems.all.reduce((sum, item) => {
+		return sum + ((item as any).wearCount || 0);
+	}, 0);
+	const avgCostPerWear = totalWears > 0 ? totalValue / totalWears : 0;
+
+	// Calculate sustainability score
+	const sustainabilityScores = wardrobeItems.all.map(
+		(item) => (item as any).sustainabilityScore || 0
+	);
+	const avgSustainabilityScore =
+		sustainabilityScores.length > 0
+			? sustainabilityScores.reduce((a, b) => a + b, 0) /
+				sustainabilityScores.length
+			: 0;
+
 	return (
 		<Card>
 			<CardHeader className="pb-3">
@@ -20,10 +61,9 @@ export function QuickStatsCard({ wardrobeItems }: QuickStatsCardProps) {
 						</div>
 						<span className="text-sm">Total Items</span>
 					</div>
-					<span className="font-bold">
-						{wardrobeItems.all.length}
-					</span>
+					<span className="font-bold">{totalItems}</span>
 				</div>
+
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -31,10 +71,9 @@ export function QuickStatsCard({ wardrobeItems }: QuickStatsCardProps) {
 						</div>
 						<span className="text-sm">Saved Outfits</span>
 					</div>
-					<span className="font-bold">
-						{wardrobeItems.outfits.length}
-					</span>
+					<span className="font-bold">{totalOutfits}</span>
 				</div>
+
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -42,8 +81,35 @@ export function QuickStatsCard({ wardrobeItems }: QuickStatsCardProps) {
 						</div>
 						<span className="text-sm">Most Worn</span>
 					</div>
-					<span className="font-bold text-sm">Jeans</span>
+					<span className="font-bold text-sm">
+						{mostWornItem?.name || "N/A"}
+					</span>
 				</div>
+
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+							<DollarSign className="w-4 h-4 text-blue-600" />
+						</div>
+						<span className="text-sm">Avg Cost/Wear</span>
+					</div>
+					<span className="font-bold">
+						${avgCostPerWear.toFixed(2)}
+					</span>
+				</div>
+
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+							<Leaf className="w-4 h-4 text-green-600" />
+						</div>
+						<span className="text-sm">Eco Score</span>
+					</div>
+					<span className="font-bold">
+						{avgSustainabilityScore.toFixed(1)}%
+					</span>
+				</div>
+
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">

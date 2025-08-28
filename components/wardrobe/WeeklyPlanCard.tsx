@@ -8,15 +8,53 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DayPlan } from "@/data";
-import { Star, Cloud, User, Shield, Info, Sparkles, Plus } from "lucide-react";
+import {
+	Star,
+	Cloud,
+	User,
+	Shield,
+	Info,
+	Sparkles,
+	Plus,
+	Leaf,
+	Zap,
+	TrendingUp,
+} from "lucide-react";
 
 interface WeeklyPlanCardProps {
 	dayPlan: DayPlan;
 }
 
 export function WeeklyPlanCard({ dayPlan }: WeeklyPlanCardProps) {
+	const sustainabilityScore =
+		(dayPlan.recommendedOutfit as any).sustainabilityScore || 0;
+	const isHighSustainability = sustainabilityScore >= 80;
+	const isAIRecommended =
+		(dayPlan.recommendedOutfit as any).isAIGenerated || false;
+	const comfortLevel = (dayPlan.recommendedOutfit as any).comfortLevel || 0;
+
 	return (
-		<Card className="hover:shadow-md transition-shadow">
+		<Card className="hover:shadow-md transition-shadow relative">
+			{/* Enhanced Status Indicators */}
+			<div className="absolute top-2 right-2 z-10 flex gap-1">
+				{isHighSustainability && (
+					<Badge
+						variant="secondary"
+						className="text-xs bg-green-100 text-green-700"
+					>
+						<Leaf className="w-3 h-3" />
+					</Badge>
+				)}
+				{isAIRecommended && (
+					<Badge
+						variant="secondary"
+						className="text-xs bg-purple-100 text-purple-700"
+					>
+						<Zap className="w-3 h-3" />
+					</Badge>
+				)}
+			</div>
+
 			<CardHeader className="pb-3">
 				<div className="flex justify-between items-start">
 					<div>
@@ -36,10 +74,18 @@ export function WeeklyPlanCard({ dayPlan }: WeeklyPlanCardProps) {
 				</div>
 			</CardHeader>
 			<CardContent className="space-y-3">
-				{/* Weather */}
-				<div className="flex items-center gap-2 text-xs text-muted-foreground">
-					<Cloud className="w-3 h-3" />
-					{dayPlan.weather}
+				{/* Weather and Stats */}
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2 text-xs text-muted-foreground">
+						<Cloud className="w-3 h-3" />
+						{dayPlan.weather}
+					</div>
+					{comfortLevel > 0 && (
+						<div className="flex items-center gap-1 text-xs text-muted-foreground">
+							<TrendingUp className="w-3 h-3" />
+							{comfortLevel}/5 comfort
+						</div>
+					)}
 				</div>
 
 				{/* Outfit Image Template */}

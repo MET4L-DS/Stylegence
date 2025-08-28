@@ -7,7 +7,20 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DayPlan } from "@/data";
-import { Cloud, Star, User, Shield, Palette, Plus } from "lucide-react";
+import {
+	Cloud,
+	Star,
+	User,
+	Shield,
+	Palette,
+	Plus,
+	Brain,
+	Leaf,
+	Zap,
+	TrendingUp,
+	DollarSign,
+	Clock,
+} from "lucide-react";
 
 interface TodaysRecommendationCardProps {
 	selectedDay: string;
@@ -18,9 +31,34 @@ export function TodaysRecommendationCard({
 	selectedDay,
 	selectedDayOutfit,
 }: TodaysRecommendationCardProps) {
+	const isAIGenerated =
+		(selectedDayOutfit?.recommendedOutfit as any)?.isAIGenerated || false;
+	const sustainabilityScore =
+		(selectedDayOutfit?.recommendedOutfit as any)?.sustainabilityScore || 0;
+	const estimatedCost =
+		(selectedDayOutfit?.recommendedOutfit as any)?.estimatedCost || 0;
+	const wearFrequency =
+		(selectedDayOutfit?.recommendedOutfit as any)?.wearFrequency ||
+		"moderate";
+	const comfortLevel =
+		(selectedDayOutfit?.recommendedOutfit as any)?.comfortLevel || 0;
+
 	return (
-		<Card className="bg-primary/5 border-primary/20">
-			<CardHeader>
+		<Card className="bg-primary/5 border-primary/20 relative overflow-hidden">
+			{/* AI Badge */}
+			{isAIGenerated && (
+				<div className="absolute top-4 left-4 z-10">
+					<Badge
+						variant="secondary"
+						className="bg-purple-100 text-purple-700 text-xs"
+					>
+						<Brain className="w-3 h-3 mr-1" />
+						AI Curated
+					</Badge>
+				</div>
+			)}
+
+			<CardHeader className="pt-6">
 				<div className="flex items-center justify-between">
 					<div>
 						<CardTitle className="text-lg">
@@ -29,7 +67,7 @@ export function TodaysRecommendationCard({
 								: `${selectedDay}'s`}{" "}
 							Perfect Look
 						</CardTitle>
-						<CardDescription className="flex items-center gap-2">
+						<CardDescription className="flex items-center gap-2 mt-1">
 							<Cloud className="w-4 h-4" />
 							{selectedDayOutfit?.day},{" "}
 							{new Date(
@@ -47,6 +85,28 @@ export function TodaysRecommendationCard({
 							{selectedDayOutfit?.recommendedOutfit.confidence}%
 						</span>
 					</div>
+				</div>
+
+				{/* Quick Stats */}
+				<div className="flex gap-2 mt-3">
+					{sustainabilityScore > 0 && (
+						<Badge variant="outline" className="text-xs">
+							<Leaf className="w-3 h-3 mr-1" />
+							{sustainabilityScore}% Eco
+						</Badge>
+					)}
+					{comfortLevel > 0 && (
+						<Badge variant="outline" className="text-xs">
+							<TrendingUp className="w-3 h-3 mr-1" />
+							{comfortLevel}/5 Comfort
+						</Badge>
+					)}
+					{estimatedCost > 0 && (
+						<Badge variant="outline" className="text-xs">
+							<DollarSign className="w-3 h-3 mr-1" />$
+							{estimatedCost}
+						</Badge>
+					)}
 				</div>
 			</CardHeader>
 			<CardContent className="p-6">
@@ -165,11 +225,41 @@ export function TodaysRecommendationCard({
 							</div>
 						</div>
 
+						{/* AI Insights Section */}
+						{isAIGenerated && (
+							<div className="space-y-2 bg-purple-50 rounded-lg p-3 border border-purple-200">
+								<h4 className="text-sm font-semibold text-purple-800 flex items-center gap-2">
+									<Zap className="w-4 h-4" />
+									AI Insights
+								</h4>
+								<p className="text-sm text-purple-700">
+									This outfit is perfectly tailored to your
+									style preferences, weather conditions, and
+									scheduled activities.
+								</p>
+								<div className="grid grid-cols-2 gap-2 mt-2">
+									<div className="text-xs">
+										<span className="font-medium">
+											Style Match:
+										</span>{" "}
+										95%
+									</div>
+									<div className="text-xs">
+										<span className="font-medium">
+											Comfort Score:
+										</span>{" "}
+										{comfortLevel}/5
+									</div>
+								</div>
+							</div>
+						)}
+
 						{/* Schedule for selected day */}
 						{selectedDayOutfit?.schedule &&
 							selectedDayOutfit.schedule.length > 0 && (
 								<div className="space-y-2">
-									<h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+									<h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+										<Clock className="w-4 h-4" />
 										{selectedDay === "Wednesday"
 											? "Today's"
 											: `${selectedDay}'s`}{" "}
@@ -177,7 +267,7 @@ export function TodaysRecommendationCard({
 									</h4>
 									<div className="space-y-1">
 										{selectedDayOutfit.schedule
-											.slice(0, 2)
+											.slice(0, 3)
 											.map((event, index) => (
 												<div
 													key={index}
@@ -187,6 +277,15 @@ export function TodaysRecommendationCard({
 													{event}
 												</div>
 											))}
+										{selectedDayOutfit.schedule.length >
+											3 && (
+											<div className="text-xs text-muted-foreground italic pl-4">
+												+
+												{selectedDayOutfit.schedule
+													.length - 3}{" "}
+												more events
+											</div>
+										)}
 									</div>
 								</div>
 							)}
