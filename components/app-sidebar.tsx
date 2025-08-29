@@ -20,6 +20,7 @@ import {
 	IconCreditCard,
 	IconArrowBack,
 	IconShirt,
+	IconUser,
 } from "@tabler/icons-react";
 
 import { NavDocuments } from "@/components/nav-documents";
@@ -55,6 +56,11 @@ const data = {
 			title: "Wardrobe",
 			url: "/dashboard/wardrobe",
 			icon: IconShirt,
+		},
+		{
+			title: "Profile",
+			url: "/dashboard/profile",
+			icon: IconUser,
 		},
 		{
 			title: "Payment Gated",
