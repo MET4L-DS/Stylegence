@@ -328,12 +328,12 @@ export default function ProfilePage() {
 					<h1 className="text-2xl font-bold">
 						{isSetupMode
 							? "Complete Your Profile"
-							: "Profile Settings"}
+							: "Style Preferences"}
 					</h1>
 					<p className="text-muted-foreground">
 						{isSetupMode
 							? "Let's personalize your Stylegence experience with a few quick details"
-							: "Personalize your Stylegence experience"}
+							: "Personalize your style and fit preferences for better recommendations"}
 					</p>
 					{isSetupMode && (
 						<div className="space-y-2 mt-3">

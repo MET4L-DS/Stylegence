@@ -58,11 +58,6 @@ const data = {
 			icon: IconShirt,
 		},
 		{
-			title: "Profile",
-			url: "/dashboard/profile",
-			icon: IconUser,
-		},
-		{
 			title: "Payment Gated",
 			url: "/dashboard/payment-gated",
 			icon: IconCreditCard,
@@ -182,7 +177,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavSecondary items={data.navSecondary} className="mt-auto" />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={data.user} />
+				<NavUser />
 			</SidebarFooter>
 		</Sidebar>
 	);
