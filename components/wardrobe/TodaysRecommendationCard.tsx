@@ -235,12 +235,12 @@ export function TodaysRecommendationCard({
 
 						{/* AI Insights Section */}
 						{isAIGenerated && (
-							<div className="space-y-2 bg-purple-50 rounded-lg p-3 border border-purple-200">
-								<h4 className="text-sm font-semibold text-purple-800 flex items-center gap-2">
+							<div className="space-y-2 bg-purple-100/50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
+								<h4 className="text-sm font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
 									<Zap className="w-4 h-4" />
 									AI Insights
 								</h4>
-								<p className="text-sm text-purple-700">
+								<p className="text-sm text-purple-700 dark:text-purple-300">
 									{userPreferences?.stylePreferences &&
 									userPreferences.stylePreferences.length > 0
 										? `This outfit matches your ${userPreferences.stylePreferences.slice(0, 2).join(" and ")} style${userPreferences.stylePreferences.length > 2 ? " preferences" : ""}, weather conditions, and scheduled activities.`

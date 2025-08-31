@@ -26,7 +26,7 @@ export function WeeklyOverview({
 			</CardHeader>
 			<CardContent>
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-					<div className="text-center p-3 bg-primary/5 rounded-lg">
+					<div className="text-center p-3 bg-primary/10 dark:bg-primary/20 rounded-lg border border-primary/20">
 						<div className="text-xl font-bold text-foreground">
 							{daysPlanned}
 						</div>
@@ -34,7 +34,7 @@ export function WeeklyOverview({
 							Days Planned
 						</p>
 					</div>
-					<div className="text-center p-3 bg-green-50 rounded-lg">
+					<div className="text-center p-3 bg-green-100/50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
 						<div className="text-xl font-bold text-foreground">
 							{avgConfidence}%
 						</div>
@@ -42,7 +42,7 @@ export function WeeklyOverview({
 							Avg Confidence
 						</p>
 					</div>
-					<div className="text-center p-3 bg-blue-50 rounded-lg">
+					<div className="text-center p-3 bg-blue-100/50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
 						<div className="text-xl font-bold text-foreground">
 							{itemsUsed}
 						</div>
@@ -50,7 +50,7 @@ export function WeeklyOverview({
 							Items Used
 						</p>
 					</div>
-					<div className="text-center p-3 bg-yellow-50 rounded-lg">
+					<div className="text-center p-3 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
 						<div className="text-xl font-bold text-foreground">
 							{versatilePieces}
 						</div>

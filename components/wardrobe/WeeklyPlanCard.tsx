@@ -133,10 +133,10 @@ export function WeeklyPlanCard({ dayPlan }: WeeklyPlanCardProps) {
 									item.includes("Belt") ||
 									item.includes("Bag")
 							) ? (
-								<div className="bg-yellow-50 rounded-md flex items-center justify-center border border-yellow-200">
+								<div className="bg-yellow-100/50 dark:bg-yellow-900/20 rounded-md flex items-center justify-center border border-yellow-200 dark:border-yellow-800">
 									<div className="text-center">
-										<Sparkles className="w-4 h-4 mx-auto mb-1 text-yellow-600" />
-										<span className="text-xs text-yellow-700 font-medium">
+										<Sparkles className="w-4 h-4 mx-auto mb-1 text-yellow-600 dark:text-yellow-400" />
+										<span className="text-xs text-yellow-700 dark:text-yellow-300 font-medium">
 											Extra
 										</span>
 									</div>
