@@ -1,6 +1,7 @@
 export * from "./types";
 export * from "./constants";
 export * from "./analytics";
+export * from "./profile";
 export { wardrobeItems, brands, categories } from "./wardrobeItems";
 export { outfits } from "./outfits";
 export { weeklyPlan } from "./weeklyPlan";

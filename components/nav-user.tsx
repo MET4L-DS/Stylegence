@@ -24,7 +24,7 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { ProfileModal } from "@/components/ProfileModal";
+import { ProfileModal } from "@/components/profile";
 
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { useState } from "react";

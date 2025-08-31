@@ -245,3 +245,34 @@ export interface WeatherPreference {
 	preferredLayers: number;
 	weatherSensitivity: "low" | "medium" | "high";
 }
+
+// Profile-related types
+export interface ProfileData {
+	username: string;
+	stylePreferences: string[];
+	favoriteBrands: string[];
+	bodyType: string;
+	preferredCurrency: string;
+	preferredSizeSystem: string;
+	sizeLabel: string;
+	consent_storeBodyMetrics: boolean;
+	consent_shareReviewsPublic: boolean;
+}
+
+export interface BodyMeasurements {
+	heightCm: number | undefined;
+	weightKg: number | undefined;
+	bustCm: number | undefined;
+	waistCm: number | undefined;
+	hipsCm: number | undefined;
+	inseamCm: number | undefined;
+	shoulderCm: number | undefined;
+	neckCm: number | undefined;
+	notes: string;
+}
+
+export interface ProfileModalProps {
+	children?: React.ReactNode;
+	isOpen?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
