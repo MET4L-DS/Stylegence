@@ -25,11 +25,19 @@ import {
 interface TodaysRecommendationCardProps {
 	selectedDay: string;
 	selectedDayOutfit: DayPlan | undefined;
+	userPreferences?: {
+		stylePreferences?: string[];
+		bodyType?: string;
+		favoriteBrands?: string[];
+		preferredCurrency?: string;
+		name?: string;
+	} | null;
 }
 
 export function TodaysRecommendationCard({
 	selectedDay,
 	selectedDayOutfit,
+	userPreferences,
 }: TodaysRecommendationCardProps) {
 	const isAIGenerated =
 		(selectedDayOutfit?.recommendedOutfit as any)?.isAIGenerated || false;
@@ -233,24 +241,61 @@ export function TodaysRecommendationCard({
 									AI Insights
 								</h4>
 								<p className="text-sm text-purple-700">
-									This outfit is perfectly tailored to your
-									style preferences, weather conditions, and
-									scheduled activities.
+									{userPreferences?.stylePreferences &&
+									userPreferences.stylePreferences.length > 0
+										? `This outfit matches your ${userPreferences.stylePreferences.slice(0, 2).join(" and ")} style${userPreferences.stylePreferences.length > 2 ? " preferences" : ""}, weather conditions, and scheduled activities.`
+										: "This outfit is perfectly tailored to your style preferences, weather conditions, and scheduled activities."}
 								</p>
 								<div className="grid grid-cols-2 gap-2 mt-2">
 									<div className="text-xs">
 										<span className="font-medium">
 											Style Match:
 										</span>{" "}
-										95%
+										{userPreferences?.stylePreferences
+											?.length
+											? Math.min(
+													95 +
+														userPreferences
+															.stylePreferences
+															.length *
+															2,
+													99
+												)
+											: 95}
+										%
 									</div>
 									<div className="text-xs">
 										<span className="font-medium">
 											Comfort Score:
 										</span>{" "}
-										{comfortLevel}/5
+										{userPreferences?.bodyType
+											? Math.min(comfortLevel + 1, 5)
+											: comfortLevel}
+										/5
 									</div>
 								</div>
+								{userPreferences?.stylePreferences &&
+									userPreferences.stylePreferences.length >
+										0 && (
+										<div className="mt-2">
+											<div className="text-xs font-medium text-purple-800 mb-1">
+												Your Style:
+											</div>
+											<div className="flex flex-wrap gap-1">
+												{userPreferences.stylePreferences
+													.slice(0, 3)
+													.map((style, index) => (
+														<Badge
+															key={index}
+															variant="outline"
+															className="text-xs bg-purple-100 text-purple-700 border-purple-300"
+														>
+															{style}
+														</Badge>
+													))}
+											</div>
+										</div>
+									)}
 							</div>
 						)}
 

@@ -58,14 +58,16 @@ export const COLOR_PALETTE = [
 
 // User profile data
 export const USER_PROFILE = {
-	name: "John Doe",
-	email: "john@example.com",
+	name: "Alex Chen",
+	email: "alex@example.com",
 	avatar: "/api/placeholder/32/32",
-	initials: "JD",
+	initials: "AC",
 	userId: "user_123",
-	stylePreferences: ["modern", "minimalist", "professional"],
+	stylePreferences: ["minimalist", "athleisure", "trendy"],
 	bodyType: "athletic",
 	preferredSizeSystem: "US",
+	favoriteBrands: ["Nike", "Zara", "StyleSense"],
+	preferredCurrency: "USD",
 } as const;
 
 // Days of the week

@@ -26,9 +26,19 @@ import {
 
 interface AnalyticsCardProps {
 	wardrobeItems: WardrobeData;
+	userPreferences?: {
+		stylePreferences?: string[];
+		bodyType?: string;
+		favoriteBrands?: string[];
+		preferredCurrency?: string;
+		name?: string;
+	} | null;
 }
 
-export function AnalyticsCard({ wardrobeItems }: AnalyticsCardProps) {
+export function AnalyticsCard({
+	wardrobeItems,
+	userPreferences,
+}: AnalyticsCardProps) {
 	// Calculate all analytics using the data module
 	const analytics = calculateAnalytics(wardrobeItems);
 	const {
@@ -153,6 +163,122 @@ export function AnalyticsCard({ wardrobeItems }: AnalyticsCardProps) {
 								subtitle="Environmental impact"
 							/>
 						</div>
+
+						{/* Personalized Insights */}
+						{userPreferences && (
+							<div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+								<div className="flex items-center gap-2 mb-3">
+									<Sparkles className="w-4 h-4 text-blue-600" />
+									<span className="text-sm font-semibold text-blue-800">
+										Personalized Insights
+									</span>
+								</div>
+								<div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-sm">
+									{userPreferences.stylePreferences &&
+										userPreferences.stylePreferences
+											.length > 0 && (
+											<div className="space-y-2">
+												<div className="font-medium text-blue-700">
+													Style Match
+												</div>
+												<div className="flex flex-wrap gap-1">
+													{userPreferences.stylePreferences
+														.slice(0, 3)
+														.map((style, index) => (
+															<Badge
+																key={index}
+																variant="outline"
+																className="text-xs bg-blue-100 text-blue-700 border-blue-300"
+															>
+																{style}
+															</Badge>
+														))}
+													{userPreferences
+														.stylePreferences
+														.length > 3 && (
+														<Badge
+															variant="outline"
+															className="text-xs bg-blue-100 text-blue-700 border-blue-300"
+														>
+															+
+															{userPreferences
+																.stylePreferences
+																.length -
+																3}{" "}
+															more
+														</Badge>
+													)}
+												</div>
+											</div>
+										)}
+									{userPreferences.bodyType && (
+										<div className="space-y-2">
+											<div className="font-medium text-blue-700">
+												Body Type
+											</div>
+											<Badge
+												variant="outline"
+												className="bg-purple-100 text-purple-700 border-purple-300"
+											>
+												{userPreferences.bodyType}
+											</Badge>
+										</div>
+									)}
+									{userPreferences.favoriteBrands &&
+										userPreferences.favoriteBrands.length >
+											0 && (
+											<div className="space-y-2">
+												<div className="font-medium text-blue-700">
+													Favorite Brands
+												</div>
+												<div className="flex flex-wrap gap-1">
+													{userPreferences.favoriteBrands
+														.slice(0, 2)
+														.map((brand, index) => (
+															<Badge
+																key={index}
+																variant="outline"
+																className="text-xs bg-green-100 text-green-700 border-green-300"
+															>
+																{brand}
+															</Badge>
+														))}
+													{userPreferences
+														.favoriteBrands.length >
+														2 && (
+														<Badge
+															variant="outline"
+															className="text-xs bg-green-100 text-green-700 border-green-300"
+														>
+															+
+															{userPreferences
+																.favoriteBrands
+																.length -
+																2}{" "}
+															more
+														</Badge>
+													)}
+												</div>
+											</div>
+										)}
+									{userPreferences.preferredCurrency && (
+										<div className="space-y-2">
+											<div className="font-medium text-blue-700">
+												Currency
+											</div>
+											<Badge
+												variant="outline"
+												className="bg-amber-100 text-amber-700 border-amber-300"
+											>
+												{
+													userPreferences.preferredCurrency
+												}
+											</Badge>
+										</div>
+									)}
+								</div>
+							</div>
+						)}
 
 						<div className="pt-4 border-t space-y-4">
 							{/* Wear Progress */}

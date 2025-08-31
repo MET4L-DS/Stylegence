@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus } from "lucide-react";
@@ -19,10 +22,13 @@ import {
 	WelcomeSection,
 } from "@/components/wardrobe";
 
-// Use imported data
+// Use imported data (will be replaced with Convex data in future)
 const wardrobeItems = wardrobeData;
 
 export default function WardrobePage() {
+	const { user: clerkUser } = useUser();
+	const convexUser = useQuery(api.users.current);
+
 	const [activeTab, setActiveTab] = useState("all");
 	const [selectedCategory, setSelectedCategory] = useState("All");
 	const [selectedDay, setSelectedDay] = useState("Wednesday"); // Default to today
@@ -43,12 +49,32 @@ export default function WardrobePage() {
 		) ||
 		wardrobeItems.weeklyPlan.find((dayPlan) => dayPlan.day === "Wednesday"); // Fallback to Wednesday
 
+	// Show loading state while user data is loading
+	if (!clerkUser || convexUser === undefined) {
+		return (
+			<div className="flex items-center justify-center min-h-96">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+					<p className="text-muted-foreground">Loading wardrobe...</p>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
 			{/* Welcome Section with Today's Outfit */}
 			<div className="mb-8">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-					<WelcomeSection>
+					<WelcomeSection
+						userName={
+							convexUser?.username ||
+							convexUser?.name ||
+							clerkUser?.firstName ||
+							"there"
+						}
+						subtitle="Manage your wardrobe and create amazing outfits tailored to your style."
+					>
 						<DaySwitcher
 							weeklyPlan={wardrobeItems.weeklyPlan}
 							selectedDay={selectedDay}
@@ -57,12 +83,16 @@ export default function WardrobePage() {
 						<TodaysRecommendationCard
 							selectedDay={selectedDay}
 							selectedDayOutfit={selectedDayOutfit}
+							userPreferences={convexUser}
 						/>
 					</WelcomeSection>
 
 					{/* Compact Analytics */}
 					<div className="space-y-4">
-						<AnalyticsCard wardrobeItems={wardrobeItems} />
+						<AnalyticsCard
+							wardrobeItems={wardrobeItems}
+							userPreferences={convexUser}
+						/>
 						<WeeklyProgress />
 					</div>
 				</div>
