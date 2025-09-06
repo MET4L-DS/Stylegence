@@ -419,12 +419,12 @@ export function AnalyticsCard({
 										Most Worn Item
 									</span>
 									<Badge>
-										{wearStats.mostWornItem.wearCount || 0}{" "}
+										{wearStats.mostWornItem?.wearCount || 0}{" "}
 										times
 									</Badge>
 								</div>
 								<p className="text-xs text-muted-foreground">
-									{wearStats.mostWornItem.name}
+									{wearStats.mostWornItem?.name || "No items"}
 								</p>
 							</div>
 
@@ -434,12 +434,14 @@ export function AnalyticsCard({
 										Least Worn Item
 									</span>
 									<Badge variant="outline">
-										{wearStats.leastWornItem.wearCount || 0}{" "}
+										{wearStats.leastWornItem?.wearCount ||
+											0}{" "}
 										times
 									</Badge>
 								</div>
 								<p className="text-xs text-muted-foreground">
-									{wearStats.leastWornItem.name}
+									{wearStats.leastWornItem?.name ||
+										"No items"}
 								</p>
 							</div>
 
@@ -470,68 +472,107 @@ export function AnalyticsCard({
 								Efficiency Champions
 							</h4>
 							<div className="space-y-3">
-								<div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border">
-									<div className="flex items-center justify-between mb-1 min-w-0">
-										<span className="text-sm font-medium text-green-700 dark:text-green-300 truncate">
-											Most Efficient
-										</span>
-										<Badge
-											variant="secondary"
-											className="bg-green-100 dark:bg-green-800 text-xs flex-shrink-0 ml-2"
-										>
-											$
-											{(
-												(usageStats.costPerWear
-													.mostEfficient
-													.purchasePrice || 0) /
-												Math.max(
-													usageStats.costPerWear
+								{usageStats.costPerWear.mostEfficient ? (
+									<div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border">
+										<div className="flex items-center justify-between mb-1 min-w-0">
+											<span className="text-sm font-medium text-green-700 dark:text-green-300 truncate">
+												Most Efficient
+											</span>
+											<Badge
+												variant="secondary"
+												className="bg-green-100 dark:bg-green-800 text-xs flex-shrink-0 ml-2"
+											>
+												$
+												{(
+													(usageStats.costPerWear
 														.mostEfficient
-														.wearCount || 1,
-													1
-												)
-											).toFixed(2)}
-											/wear
-										</Badge>
+														.purchasePrice || 0) /
+													Math.max(
+														usageStats.costPerWear
+															.mostEfficient
+															.wearCount || 1,
+														1
+													)
+												).toFixed(2)}
+												/wear
+											</Badge>
+										</div>
+										<p className="text-xs text-green-600 dark:text-green-400 truncate">
+											{
+												usageStats.costPerWear
+													.mostEfficient.name
+											}
+										</p>
 									</div>
-									<p className="text-xs text-green-600 dark:text-green-400 truncate">
-										{
-											usageStats.costPerWear.mostEfficient
-												.name
-										}
-									</p>
-								</div>
-								<div className="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border">
-									<div className="flex items-center justify-between mb-1 min-w-0">
-										<span className="text-sm font-medium text-orange-700 dark:text-orange-300 truncate">
-											Needs More Love
-										</span>
-										<Badge
-											variant="outline"
-											className="bg-orange-100 dark:bg-orange-800 text-xs flex-shrink-0 ml-2"
-										>
-											$
-											{(
-												(usageStats.costPerWear
-													.leastEfficient
-													.purchasePrice || 0) /
-												Math.max(
-													usageStats.costPerWear
+								) : (
+									<div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/20 border">
+										<div className="flex items-center justify-between mb-1 min-w-0">
+											<span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+												Most Efficient
+											</span>
+											<Badge
+												variant="secondary"
+												className="bg-gray-100 dark:bg-gray-800 text-xs flex-shrink-0 ml-2"
+											>
+												No data
+											</Badge>
+										</div>
+										<p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+											No items with cost data
+										</p>
+									</div>
+								)}
+
+								{usageStats.costPerWear.leastEfficient ? (
+									<div className="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border">
+										<div className="flex items-center justify-between mb-1 min-w-0">
+											<span className="text-sm font-medium text-orange-700 dark:text-orange-300 truncate">
+												Needs More Love
+											</span>
+											<Badge
+												variant="outline"
+												className="bg-orange-100 dark:bg-orange-800 text-xs flex-shrink-0 ml-2"
+											>
+												$
+												{(
+													(usageStats.costPerWear
 														.leastEfficient
-														.wearCount || 1,
-													1
-												)
-											).toFixed(2)}
-											/wear
-										</Badge>
+														.purchasePrice || 0) /
+													Math.max(
+														usageStats.costPerWear
+															.leastEfficient
+															.wearCount || 1,
+														1
+													)
+												).toFixed(2)}
+												/wear
+											</Badge>
+										</div>
+										<p className="text-xs text-orange-600 dark:text-orange-400 truncate">
+											{
+												usageStats.costPerWear
+													.leastEfficient.name
+											}
+										</p>
 									</div>
-									<p className="text-xs text-orange-600 dark:text-orange-400 truncate">
-										{
-											usageStats.costPerWear
-												.leastEfficient.name
-										}
-									</p>
-								</div>
+								) : (
+									<div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/20 border">
+										<div className="flex items-center justify-between mb-1 min-w-0">
+											<span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+												Needs More Love
+											</span>
+											<Badge
+												variant="outline"
+												className="bg-gray-100 dark:bg-gray-800 text-xs flex-shrink-0 ml-2"
+											>
+												No data
+											</Badge>
+										</div>
+										<p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+											No items with cost data
+										</p>
+									</div>
+								)}
 							</div>
 						</div>
 					</TabsContent>

@@ -154,8 +154,8 @@ export interface CategoryStats {
 export interface WearStats {
 	totalWorn: number;
 	averageWear: number;
-	mostWornItem: WardrobeItem;
-	leastWornItem: WardrobeItem;
+	mostWornItem: WardrobeItem | null;
+	leastWornItem: WardrobeItem | null;
 	wearFrequency: {
 		daily: number;
 		weekly: number;
@@ -180,8 +180,8 @@ export interface UsageStats {
 	repeatPercentage: number;
 	costPerWear: {
 		average: number;
-		mostEfficient: WardrobeItem;
-		leastEfficient: WardrobeItem;
+		mostEfficient: WardrobeItem | null;
+		leastEfficient: WardrobeItem | null;
 	};
 }
 

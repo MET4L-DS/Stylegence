@@ -13,9 +13,10 @@ import {
 
 interface WardrobeItemCardProps {
 	item: WardrobeItem;
+	onClick?: (item: WardrobeItem) => void;
 }
 
-export function WardrobeItemCard({ item }: WardrobeItemCardProps) {
+export function WardrobeItemCard({ item, onClick }: WardrobeItemCardProps) {
 	const wearCount = item.wearCount || 0;
 	const costPerWear =
 		item.purchasePrice && wearCount > 0
@@ -29,7 +30,10 @@ export function WardrobeItemCard({ item }: WardrobeItemCardProps) {
 	const isFavorited = (item as any).favorited || false;
 
 	return (
-		<Card className="group cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden">
+		<Card
+			className="group cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden"
+			onClick={() => onClick?.(item)}
+		>
 			{/* Status Indicators */}
 			<div className="absolute top-2 right-2 z-10 flex gap-1">
 				{isRecentlyAdded && (

@@ -31,6 +31,21 @@ export function calculateCategoryStats(items: WardrobeItem[]): CategoryStats {
  * Calculate wear-related statistics
  */
 export function calculateWearStats(items: WardrobeItem[]): WearStats {
+	// Handle empty array case
+	if (items.length === 0) {
+		return {
+			totalWorn: 0,
+			averageWear: 0,
+			mostWornItem: null,
+			leastWornItem: null,
+			wearFrequency: {
+				daily: 0,
+				weekly: 0,
+				monthly: 0,
+			},
+		};
+	}
+
 	const totalWorn = items.reduce(
 		(sum, item) => sum + (item.wearCount || 0),
 		0
@@ -168,19 +183,27 @@ export function calculateUsageStats(items: WardrobeItem[]): UsageStats {
 				) / itemsWithPrice.length
 			: 0;
 
-	const mostEfficientItem = itemsWithPrice.reduce((prev, current) => {
-		const prevCPW = (prev.purchasePrice || 0) / (prev.wearCount || 1);
-		const currentCPW =
-			(current.purchasePrice || 0) / (current.wearCount || 1);
-		return currentCPW < prevCPW ? current : prev;
-	}, itemsWithPrice[0] || items[0]);
+	const mostEfficientItem =
+		itemsWithPrice.length > 0
+			? itemsWithPrice.reduce((prev, current) => {
+					const prevCPW =
+						(prev.purchasePrice || 0) / (prev.wearCount || 1);
+					const currentCPW =
+						(current.purchasePrice || 0) / (current.wearCount || 1);
+					return currentCPW < prevCPW ? current : prev;
+				})
+			: null;
 
-	const leastEfficientItem = itemsWithPrice.reduce((prev, current) => {
-		const prevCPW = (prev.purchasePrice || 0) / (prev.wearCount || 1);
-		const currentCPW =
-			(current.purchasePrice || 0) / (current.wearCount || 1);
-		return currentCPW > prevCPW ? current : prev;
-	}, itemsWithPrice[0] || items[0]);
+	const leastEfficientItem =
+		itemsWithPrice.length > 0
+			? itemsWithPrice.reduce((prev, current) => {
+					const prevCPW =
+						(prev.purchasePrice || 0) / (prev.wearCount || 1);
+					const currentCPW =
+						(current.purchasePrice || 0) / (current.wearCount || 1);
+					return currentCPW > prevCPW ? current : prev;
+				})
+			: null;
 
 	return {
 		neverWorn,

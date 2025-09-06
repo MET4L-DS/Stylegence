@@ -21,15 +21,16 @@ import {
 	WeeklyPlanGrid,
 	WelcomeSection,
 	AddItemModal,
+	WardrobeMigrationPanel,
 } from "@/components/wardrobe";
-
-// Use imported data (will be replaced with Convex data in future)
-const wardrobeItems = wardrobeData;
 
 export default function WardrobePage() {
 	const { user: clerkUser } = useUser();
 	const convexUser = useQuery(api.users.current);
 	const wardrobeSummary = useQuery(api.wardrobeItems.getWardrobeSummary);
+	const convexWardrobeItems = useQuery(
+		api.wardrobeItems.getUserWardrobeItems
+	);
 
 	const [activeTab, setActiveTab] = useState("all");
 	const [selectedCategory, setSelectedCategory] = useState("All");
@@ -38,22 +39,77 @@ export default function WardrobePage() {
 
 	const categories = ["All", ...WARDROBE_CATEGORIES];
 
+	// Use Convex data if available, fallback to static data for other features
+	const wardrobeItems = convexWardrobeItems || [];
+	const staticData = wardrobeData; // Keep for outfits, weekly plan etc.
+
+	// Transform Convex data to match expected interface
+	const transformedWardrobeItems = wardrobeItems.map((item) => ({
+		id: item._id,
+		userId: item.userId,
+		productVariantId: item.productVariantId,
+		sourceType: item.sourceType as "CATALOG" | "USER_UPLOADED",
+		customName: item.customName,
+		addedDate: item.addedDate,
+		purchasePrice: item.purchasePrice,
+		purchaseCurrency: item.purchaseCurrency,
+		imageUrl: item.imageUrl,
+		aiCategory: item.aiCategory,
+		aiTags: item.aiTags,
+		dominantColors: item.dominantColors,
+		visibility: item.visibility as
+			| "private"
+			| "family"
+			| "friends"
+			| "public"
+			| undefined,
+		addedAt: item.addedAt,
+		lastWornAt: item.lastWornAt,
+		wearCount: item.wearCount,
+
+		// Display fields for compatibility with WardrobeGrid
+		name: item.customName || "Untitled Item",
+		category: item.aiCategory || "uncategorized",
+		color: item.dominantColors?.[0] || "Unknown",
+		brand:
+			item.aiTags
+				?.find((tag) => tag.startsWith("brand:"))
+				?.replace("brand:", "") || "Unknown",
+		image: item.imageUrl || "/api/placeholder/200/300",
+		tags:
+			item.aiTags?.filter(
+				(tag) =>
+					!tag.startsWith("brand:") &&
+					!tag.startsWith("size:") &&
+					!tag.startsWith("notes:")
+			) || [],
+		timesWorn: item.wearCount || 0,
+		lastWorn: item.lastWornAt
+			? new Date(item.lastWornAt).toISOString().split("T")[0]
+			: undefined,
+		purchaseDate: item.addedDate
+			? new Date(item.addedDate).toISOString().split("T")[0]
+			: undefined,
+	}));
+
 	const filteredItems =
 		selectedCategory === "All"
-			? wardrobeItems.all
-			: wardrobeItems.all.filter(
+			? transformedWardrobeItems
+			: transformedWardrobeItems.filter(
 					(item) => item.category === selectedCategory
 				);
 
-	// Get selected day's outfit data
+	// Get selected day's outfit data (still using static data for now)
 	const selectedDayOutfit =
-		wardrobeItems.weeklyPlan.find(
-			(dayPlan) => dayPlan.day === selectedDay
-		) ||
-		wardrobeItems.weeklyPlan.find((dayPlan) => dayPlan.day === "Wednesday"); // Fallback to Wednesday
+		staticData.weeklyPlan.find((dayPlan) => dayPlan.day === selectedDay) ||
+		staticData.weeklyPlan.find((dayPlan) => dayPlan.day === "Wednesday"); // Fallback to Wednesday
 
 	// Show loading state while user data is loading
-	if (!clerkUser || convexUser === undefined) {
+	if (
+		!clerkUser ||
+		convexUser === undefined ||
+		convexWardrobeItems === undefined
+	) {
 		return (
 			<div className="flex items-center justify-center min-h-96">
 				<div className="text-center">
@@ -79,7 +135,7 @@ export default function WardrobePage() {
 						subtitle="Manage your wardrobe and create amazing outfits tailored to your style."
 					>
 						<DaySwitcher
-							weeklyPlan={wardrobeItems.weeklyPlan}
+							weeklyPlan={staticData.weeklyPlan}
 							selectedDay={selectedDay}
 							onDaySelect={setSelectedDay}
 						/>
@@ -93,7 +149,13 @@ export default function WardrobePage() {
 					{/* Compact Analytics */}
 					<div className="space-y-4">
 						<AnalyticsCard
-							wardrobeItems={wardrobeItems}
+							wardrobeItems={{
+								all: transformedWardrobeItems,
+								outfits: staticData.outfits,
+								weeklyPlan: staticData.weeklyPlan,
+								brands: staticData.brands,
+								categories: staticData.categories,
+							}}
 							userPreferences={convexUser}
 						/>
 						<WeeklyProgress />
@@ -139,16 +201,31 @@ export default function WardrobePage() {
 						categories={categories}
 					/>
 
-					<WardrobeGrid items={filteredItems} />
+					{transformedWardrobeItems.length === 0 ? (
+						<div className="space-y-8">
+							<div className="text-center py-12">
+								<h3 className="text-lg font-semibold mb-2">
+									Your wardrobe is empty
+								</h3>
+								<p className="text-muted-foreground mb-6">
+									Start by uploading sample items or adding
+									your own clothing pieces
+								</p>
+							</div>
+							<WardrobeMigrationPanel />
+						</div>
+					) : (
+						<WardrobeGrid items={filteredItems} />
+					)}
 				</TabsContent>
 
 				<TabsContent value="outfits" className="space-y-6">
-					<OutfitGrid outfits={wardrobeItems.outfits} />
+					<OutfitGrid outfits={staticData.outfits} />
 				</TabsContent>
 
 				<TabsContent value="weekly" className="space-y-6">
 					<WeeklyOverview />
-					<WeeklyPlanGrid weeklyPlan={wardrobeItems.weeklyPlan} />
+					<WeeklyPlanGrid weeklyPlan={staticData.weeklyPlan} />
 				</TabsContent>
 
 				<TabsContent value="wishlist" className="space-y-6">
