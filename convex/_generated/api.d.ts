@@ -16,6 +16,7 @@ import type {
 import type * as http from "../http.js";
 import type * as payments from "../payments.js";
 import type * as users from "../users.js";
+import type * as wardrobeItems from "../wardrobeItems.js";
 import type * as wishlist from "../wishlist.js";
 
 /**
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   payments: typeof payments;
   users: typeof users;
+  wardrobeItems: typeof wardrobeItems;
   wishlist: typeof wishlist;
 }>;
 export declare const api: FilterApi<

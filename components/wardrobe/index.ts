@@ -13,3 +13,4 @@ export { WardrobeGrid } from "./WardrobeGrid";
 export { OutfitGrid } from "./OutfitGrid";
 export { WeeklyPlanGrid } from "./WeeklyPlanGrid";
 export { WelcomeSection } from "./WelcomeSection";
+export { AddItemModal } from "./AddItemModal";

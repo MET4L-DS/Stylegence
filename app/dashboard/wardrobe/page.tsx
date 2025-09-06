@@ -20,6 +20,7 @@ import {
 	OutfitGrid,
 	WeeklyPlanGrid,
 	WelcomeSection,
+	AddItemModal,
 } from "@/components/wardrobe";
 
 // Use imported data (will be replaced with Convex data in future)
@@ -32,6 +33,7 @@ export default function WardrobePage() {
 	const [activeTab, setActiveTab] = useState("all");
 	const [selectedCategory, setSelectedCategory] = useState("All");
 	const [selectedDay, setSelectedDay] = useState("Wednesday"); // Default to today
+	const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
 
 	const categories = ["All", ...WARDROBE_CATEGORIES];
 
@@ -112,7 +114,7 @@ export default function WardrobePage() {
 						<TabsTrigger value="wishlist">Wishlist</TabsTrigger>
 					</TabsList>
 
-					<Button>
+					<Button onClick={() => setIsAddItemModalOpen(true)}>
 						<Plus className="w-4 h-4 mr-2" />
 						Add Item
 					</Button>
@@ -141,6 +143,12 @@ export default function WardrobePage() {
 					<EmptyWishlist />
 				</TabsContent>
 			</Tabs>
+
+			{/* Add Item Modal */}
+			<AddItemModal
+				open={isAddItemModalOpen}
+				onOpenChange={setIsAddItemModalOpen}
+			/>
 		</div>
 	);
 }
