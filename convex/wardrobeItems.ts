@@ -53,6 +53,12 @@ export const addUserUploadedItem = mutation({
 			meta: {}, // Empty object as required by schema
 		});
 
+		// Update user's wardrobeItemIds array
+		const currentWardrobeItemIds = user.wardrobeItemIds || [];
+		await ctx.db.patch(user._id, {
+			wardrobeItemIds: [...currentWardrobeItemIds, wardrobeItem],
+		});
+
 		return wardrobeItem;
 	},
 });
@@ -127,6 +133,16 @@ export const deleteWardrobeItem = mutation({
 			throw new Error("Wardrobe item not found or access denied");
 		}
 
+		// Remove from user's wardrobeItemIds array
+		const currentWardrobeItemIds = user.wardrobeItemIds || [];
+		const updatedWardrobeItemIds = currentWardrobeItemIds.filter(
+			(id) => id !== args.id
+		);
+		await ctx.db.patch(user._id, {
+			wardrobeItemIds: updatedWardrobeItemIds,
+		});
+
+		// Delete the wardrobe item
 		await ctx.db.delete(args.id);
 		return { success: true };
 	},
@@ -174,6 +190,37 @@ export const getItemsByCategory = query({
 			.collect();
 
 		return items;
+	},
+});
+
+/**
+ * Get user's wardrobe summary including counts
+ */
+export const getWardrobeSummary = query({
+	args: {},
+	handler: async (ctx) => {
+		const user = await getCurrentUserOrThrow(ctx);
+
+		const items = await ctx.db
+			.query("wardrobeItems")
+			.withIndex("byUser", (q) => q.eq("userId", user._id))
+			.collect();
+
+		const userWardrobeItemIds = user.wardrobeItemIds || [];
+
+		return {
+			totalItems: items.length,
+			userWardrobeItemIdsCount: userWardrobeItemIds.length,
+			itemsMatch: items.length === userWardrobeItemIds.length,
+			categories: items.reduce(
+				(acc, item) => {
+					const category = item.aiCategory || "uncategorized";
+					acc[category] = (acc[category] || 0) + 1;
+					return acc;
+				},
+				{} as Record<string, number>
+			),
+		};
 	},
 });
 

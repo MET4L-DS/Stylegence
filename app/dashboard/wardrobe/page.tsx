@@ -29,6 +29,7 @@ const wardrobeItems = wardrobeData;
 export default function WardrobePage() {
 	const { user: clerkUser } = useUser();
 	const convexUser = useQuery(api.users.current);
+	const wardrobeSummary = useQuery(api.wardrobeItems.getWardrobeSummary);
 
 	const [activeTab, setActiveTab] = useState("all");
 	const [selectedCategory, setSelectedCategory] = useState("All");
@@ -114,10 +115,21 @@ export default function WardrobePage() {
 						<TabsTrigger value="wishlist">Wishlist</TabsTrigger>
 					</TabsList>
 
-					<Button onClick={() => setIsAddItemModalOpen(true)}>
-						<Plus className="w-4 h-4 mr-2" />
-						Add Item
-					</Button>
+					<div className="flex gap-3 items-center">
+						{/* Debug Info */}
+						{wardrobeSummary && (
+							<div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+								Items: {wardrobeSummary.totalItems} | IDs:{" "}
+								{wardrobeSummary.userWardrobeItemIdsCount} |
+								{wardrobeSummary.itemsMatch ? " ✓" : " ❌"}
+							</div>
+						)}
+
+						<Button onClick={() => setIsAddItemModalOpen(true)}>
+							<Plus className="w-4 h-4 mr-2" />
+							Add Item
+						</Button>
+					</div>
 				</div>
 
 				<TabsContent value="all" className="space-y-6">
