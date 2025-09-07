@@ -1,7 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WardrobeData, calculateAnalytics } from "@/data";
+import {
+	calculateConvexAnalytics,
+	getItemDisplayName,
+	getItemBrand,
+	type ConvexWardrobeItem,
+} from "@/lib/convex-analytics";
 import {
 	BarChart3,
 	Tag,
@@ -25,7 +30,7 @@ import {
 } from "lucide-react";
 
 interface AnalyticsCardProps {
-	wardrobeItems: WardrobeData;
+	wardrobeItems: ConvexWardrobeItem[];
 	userPreferences?: {
 		stylePreferences?: string[];
 		bodyType?: string;
@@ -39,8 +44,8 @@ export function AnalyticsCard({
 	wardrobeItems,
 	userPreferences,
 }: AnalyticsCardProps) {
-	// Calculate all analytics using the data module
-	const analytics = calculateAnalytics(wardrobeItems);
+	// Calculate all analytics using the Convex analytics module
+	const analytics = calculateConvexAnalytics(wardrobeItems);
 	const {
 		totalItems,
 		categoryStats,
@@ -424,7 +429,11 @@ export function AnalyticsCard({
 									</Badge>
 								</div>
 								<p className="text-xs text-muted-foreground">
-									{wearStats.mostWornItem?.name || "No items"}
+									{wearStats.mostWornItem
+										? getItemDisplayName(
+												wearStats.mostWornItem
+											)
+										: "No items"}
 								</p>
 							</div>
 
@@ -440,8 +449,11 @@ export function AnalyticsCard({
 									</Badge>
 								</div>
 								<p className="text-xs text-muted-foreground">
-									{wearStats.leastWornItem?.name ||
-										"No items"}
+									{wearStats.leastWornItem
+										? getItemDisplayName(
+												wearStats.leastWornItem
+											)
+										: "No items"}
 								</p>
 							</div>
 
@@ -498,10 +510,10 @@ export function AnalyticsCard({
 											</Badge>
 										</div>
 										<p className="text-xs text-green-600 dark:text-green-400 truncate">
-											{
+											{getItemDisplayName(
 												usageStats.costPerWear
-													.mostEfficient.name
-											}
+													.mostEfficient
+											)}
 										</p>
 									</div>
 								) : (
@@ -549,10 +561,10 @@ export function AnalyticsCard({
 											</Badge>
 										</div>
 										<p className="text-xs text-orange-600 dark:text-orange-400 truncate">
-											{
+											{getItemDisplayName(
 												usageStats.costPerWear
-													.leastEfficient.name
-											}
+													.leastEfficient
+											)}
 										</p>
 									</div>
 								) : (

@@ -149,13 +149,7 @@ export default function WardrobePage() {
 					{/* Compact Analytics */}
 					<div className="space-y-4">
 						<AnalyticsCard
-							wardrobeItems={{
-								all: transformedWardrobeItems,
-								outfits: staticData.outfits,
-								weeklyPlan: staticData.weeklyPlan,
-								brands: staticData.brands,
-								categories: staticData.categories,
-							}}
+							wardrobeItems={wardrobeItems}
 							userPreferences={convexUser}
 						/>
 						<WeeklyProgress />
