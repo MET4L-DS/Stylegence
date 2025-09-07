@@ -7,7 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Outfit } from "@/data";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import {
 	Heart,
 	Calendar,
@@ -16,130 +18,241 @@ import {
 	Eye,
 	Thermometer,
 	Cloud,
+	Leaf,
+	Zap,
+	TrendingUp,
+	Trash2,
+	User,
+	Palette,
+	DollarSign,
 } from "lucide-react";
 
 interface OutfitCardProps {
-	outfit: Outfit;
+	outfitId: Id<"outfits">;
+	onDelete?: () => void;
 }
 
-export function OutfitCard({ outfit }: OutfitCardProps) {
-	const isFavorited = (outfit as any).favorited || false;
-	const wearCount = (outfit as any).wearCount || 0;
-	const isRecentlyWorn = outfit.lastWorn
-		? new Date(outfit.lastWorn) >
-			new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-		: false;
-	const weatherSuitability = (outfit as any).weatherSuitability || [];
-	const styleRating = (outfit as any).styleRating || 0;
+export function OutfitCard({ outfitId, onDelete }: OutfitCardProps) {
+	// Get all user outfits and find the specific one
+	const allOutfits = useQuery(api.outfits.getUserOutfits, {});
+	const outfit = allOutfits?.find((o) => o._id === outfitId);
+
+	const deleteOutfit = useMutation(api.outfits.deleteOutfit);
+
+	const handleDelete = async () => {
+		try {
+			await deleteOutfit({ outfitId });
+			onDelete?.();
+		} catch (error) {
+			console.error("Failed to delete outfit:", error);
+		}
+	};
+
+	// Loading state
+	if (!outfit) {
+		return (
+			<Card className="hover:shadow-md transition-shadow relative">
+				<CardHeader className="pb-3">
+					<div className="flex justify-between items-start">
+						<div>
+							<div className="h-4 bg-muted rounded w-20 mb-1"></div>
+							<div className="h-3 bg-muted rounded w-16"></div>
+						</div>
+					</div>
+				</CardHeader>
+				<CardContent>
+					<div className="aspect-[3/4] bg-muted rounded-lg"></div>
+				</CardContent>
+			</Card>
+		);
+	}
+
+	const sustainabilityScore =
+		outfit.items.reduce((sum, item) => sum + (item?.wearCount || 0), 0) *
+		10; // Simple calculation
+	const isHighSustainability = sustainabilityScore >= 70;
+	const isAIRecommended = outfit.tags?.includes("ai-generated") || false;
+	const totalCost = outfit.items.reduce(
+		(sum, item) => sum + (item?.purchasePrice || 0),
+		0
+	);
+	const comfortLevel = Math.min(100, Math.max(50, sustainabilityScore));
 
 	return (
-		<Card className="cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden">
-			{/* Status Indicators */}
-			<div className="absolute top-3 right-3 z-10 flex gap-1">
-				{isFavorited && (
+		<Card className="hover:shadow-md transition-shadow relative">
+			{/* Enhanced Status Indicators */}
+			<div className="absolute top-2 right-2 z-10 flex gap-1">
+				{isHighSustainability && (
 					<Badge
 						variant="secondary"
-						className="text-xs bg-red-100 text-red-700"
+						className="text-xs bg-green-100 text-green-700"
 					>
-						<Heart className="w-3 h-3 mr-1 fill-current" />
-						Loved
+						<Leaf className="w-3 h-3" />
 					</Badge>
 				)}
-				{isRecentlyWorn && (
+				{isAIRecommended && (
 					<Badge
 						variant="secondary"
-						className="text-xs bg-blue-100 text-blue-700"
+						className="text-xs bg-purple-100 text-purple-700"
 					>
-						Recent
+						<Zap className="w-3 h-3" />
 					</Badge>
 				)}
 			</div>
 
 			<CardHeader className="pb-3">
-				<div className="flex items-start justify-between">
-					<div className="flex-1">
-						<CardTitle className="text-lg">{outfit.name}</CardTitle>
-						<CardDescription className="flex items-center gap-4 mt-1">
-							{outfit.lastWorn && (
-								<span className="flex items-center gap-1">
-									<Calendar className="w-3 h-3" />
-									Last worn:{" "}
-									{new Date(
-										outfit.lastWorn
-									).toLocaleDateString()}
-								</span>
-							)}
-							{wearCount > 0 && (
-								<span className="flex items-center gap-1">
-									<Users className="w-3 h-3" />
-									{wearCount} times
-								</span>
-							)}
+				<div className="flex justify-between items-start">
+					<div>
+						<CardTitle className="text-base">
+							{outfit.name}
+						</CardTitle>
+						<CardDescription className="text-xs">
+							{new Date(
+								outfit._creationTime
+							).toLocaleDateString()}
 						</CardDescription>
+					</div>
+					<div className="flex items-center gap-1">
+						<Star className="w-3 h-3 text-yellow-500" />
+						<span className="text-xs font-medium">
+							{comfortLevel}%
+						</span>
 					</div>
 				</div>
 			</CardHeader>
 
-			<CardContent className="space-y-4">
-				{/* Occasion and Weather */}
-				<div className="flex items-center gap-2 flex-wrap">
-					<Badge
-						variant="outline"
-						className="flex items-center gap-1"
-					>
-						<Star className="w-3 h-3" />
-						{outfit.occasion}
-					</Badge>
-					{weatherSuitability.length > 0 && (
-						<Badge
-							variant="secondary"
-							className="flex items-center gap-1"
-						>
-							<Cloud className="w-3 h-3" />
-							{weatherSuitability[0]}
-						</Badge>
-					)}
-					{styleRating > 0 && (
-						<Badge
-							variant="secondary"
-							className="flex items-center gap-1"
-						>
-							<Eye className="w-3 h-3" />
-							{styleRating}/5
-						</Badge>
+			<CardContent className="space-y-3">
+				{/* Weather and Stats */}
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2 text-xs text-muted-foreground">
+						<Cloud className="w-3 h-3" />
+						Saved outfit
+					</div>
+					{comfortLevel > 0 && (
+						<div className="flex items-center gap-1 text-xs text-muted-foreground">
+							<TrendingUp className="w-3 h-3" />
+							{Math.round(comfortLevel / 20)}/5 comfort
+						</div>
 					)}
 				</div>
 
-				{/* Items List */}
-				<div className="space-y-2">
-					<p className="text-sm font-medium flex items-center gap-1">
-						<span>Items ({outfit.items.length})</span>
-					</p>
-					<div className="grid grid-cols-1 gap-1 max-h-24 overflow-y-auto">
-						{outfit.items.slice(0, 4).map((item, index) => (
-							<p
-								key={index}
-								className="text-sm text-muted-foreground flex items-center gap-2"
-							>
-								<span className="w-1 h-1 bg-muted-foreground rounded-full" />
-								{item}
-							</p>
-						))}
-						{outfit.items.length > 4 && (
-							<p className="text-xs text-muted-foreground italic">
-								+{outfit.items.length - 4} more items
-							</p>
-						)}
+				{/* Outfit Items Grid - Similar to WeeklyPlanCard */}
+				<div className="relative">
+					<div className="aspect-[3/4] bg-gradient-to-b from-background to-muted/30 rounded-lg flex flex-col items-center justify-center border border-border relative overflow-hidden">
+						{/* Clothing Items Grid */}
+						<div className="absolute inset-2 grid grid-cols-2 gap-1">
+							{outfit.items
+								.filter((item) => item !== null)
+								.slice(0, 4)
+								.map((item, index) => (
+									<div
+										key={item!._id}
+										className="bg-primary/10 rounded-md flex items-center justify-center border border-primary/20 overflow-hidden"
+									>
+										{item!.imageUrl ? (
+											<img
+												src={item!.imageUrl}
+												alt={item!.customName || "Item"}
+												className="w-full h-full object-cover"
+											/>
+										) : (
+											<div className="text-center">
+												<User className="w-4 h-4 mx-auto mb-1 text-primary/60" />
+												<span className="text-xs text-primary/80 font-medium truncate px-1">
+													{item!.customName ||
+														item!.aiCategory ||
+														"Item"}
+												</span>
+											</div>
+										)}
+									</div>
+								))}
+							{/* Fill remaining slots if less than 4 items */}
+							{Array.from({
+								length: Math.max(
+									0,
+									4 -
+										outfit.items.filter(
+											(item) => item !== null
+										).length
+								),
+							}).map((_, index) => (
+								<div
+									key={`empty-${index}`}
+									className="bg-muted/30 rounded-md flex items-center justify-center border border-muted"
+								>
+									<Palette className="w-3 h-3 text-muted-foreground" />
+								</div>
+							))}
+						</div>
+
+						{/* Outfit count overlay */}
+						<div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+							{
+								outfit.items.filter((item) => item !== null)
+									.length
+							}{" "}
+							items
+						</div>
 					</div>
 				</div>
 
+				{/* Enhanced Stats Row */}
+				<div className="grid grid-cols-3 gap-2 text-xs">
+					<div className="text-center p-2 bg-muted/30 rounded">
+						<DollarSign className="w-3 h-3 mx-auto mb-1 text-green-600" />
+						<span className="text-muted-foreground">Cost</span>
+						<p className="font-medium">${totalCost.toFixed(0)}</p>
+					</div>
+					<div className="text-center p-2 bg-muted/30 rounded">
+						<Leaf className="w-3 h-3 mx-auto mb-1 text-green-600" />
+						<span className="text-muted-foreground">Eco</span>
+						<p className="font-medium">
+							{sustainabilityScore.toFixed(0)}%
+						</p>
+					</div>
+					<div className="text-center p-2 bg-muted/30 rounded">
+						<Star className="w-3 h-3 mx-auto mb-1 text-yellow-600" />
+						<span className="text-muted-foreground">Style</span>
+						<p className="font-medium">
+							{comfortLevel.toFixed(0)}%
+						</p>
+					</div>
+				</div>
+
+				{/* Tags */}
+				{outfit.tags && outfit.tags.length > 0 && (
+					<div className="flex flex-wrap gap-1">
+						{outfit.tags.slice(0, 3).map((tag) => (
+							<Badge
+								key={tag}
+								variant="outline"
+								className="text-xs"
+							>
+								{tag}
+							</Badge>
+						))}
+						{outfit.tags.length > 3 && (
+							<Badge variant="outline" className="text-xs">
+								+{outfit.tags.length - 3}
+							</Badge>
+						)}
+					</div>
+				)}
+
 				{/* Action Buttons */}
-				<div className="flex space-x-2 pt-2 border-t">
-					<Button size="sm" variant="outline" className="flex-1">
-						Edit
+				<div className="flex gap-2 pt-2">
+					<Button variant="outline" size="sm" className="flex-1">
+						<Eye className="w-4 h-4 mr-1" />
+						View
 					</Button>
-					<Button size="sm" className="flex-1">
-						Wear Today
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={handleDelete}
+						className="px-3"
+					>
+						<Trash2 className="w-4 h-4" />
 					</Button>
 				</div>
 			</CardContent>

@@ -6,25 +6,26 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DayPlan } from "@/data";
+import { Button } from "@/components/ui/button";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
 	Cloud,
 	Star,
-	User,
-	Shield,
 	Palette,
-	Plus,
 	Brain,
 	Leaf,
-	Zap,
 	TrendingUp,
 	DollarSign,
-	Clock,
+	RefreshCw,
+	Heart,
+	Save,
 } from "lucide-react";
 
 interface TodaysRecommendationCardProps {
 	selectedDay: string;
-	selectedDayOutfit: DayPlan | undefined;
 	userPreferences?: {
 		stylePreferences?: string[];
 		bodyType?: string;
@@ -36,20 +37,132 @@ interface TodaysRecommendationCardProps {
 
 export function TodaysRecommendationCard({
 	selectedDay,
-	selectedDayOutfit,
 	userPreferences,
 }: TodaysRecommendationCardProps) {
-	const isAIGenerated =
-		(selectedDayOutfit?.recommendedOutfit as any)?.isAIGenerated || false;
-	const sustainabilityScore =
-		(selectedDayOutfit?.recommendedOutfit as any)?.sustainabilityScore || 0;
-	const estimatedCost =
-		(selectedDayOutfit?.recommendedOutfit as any)?.estimatedCost || 0;
-	const wearFrequency =
-		(selectedDayOutfit?.recommendedOutfit as any)?.wearFrequency ||
-		"moderate";
-	const comfortLevel =
-		(selectedDayOutfit?.recommendedOutfit as any)?.comfortLevel || 0;
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [savedOutfitName, setSavedOutfitName] = useState("");
+	const [showSaveDialog, setShowSaveDialog] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [justSaved, setJustSaved] = useState(false);
+
+	// Get outfit suggestion from Convex
+	const outfitSuggestion = useQuery(api.outfits.generateOutfitSuggestion, {
+		occasion:
+			selectedDay === "Saturday" || selectedDay === "Sunday"
+				? "weekend"
+				: "casual",
+		weather: "mild", // This could be dynamic based on weather API
+	});
+
+	// Get user's saved outfits to check if this combination is already saved
+	const userOutfits = useQuery(api.outfits.getUserOutfits, {});
+	const saveOutfit = useMutation(api.outfits.saveOutfit);
+
+	// Check if this outfit combination is already saved
+	const isOutfitSaved =
+		(outfitSuggestion?.items &&
+			userOutfits?.some((outfit) => {
+				const outfitItemIds = outfit.items
+					.map((item) => item?._id)
+					.filter(Boolean)
+					.sort();
+				const currentItemIds = outfitSuggestion.items
+					.map((item) => item._id)
+					.sort();
+				return (
+					outfitItemIds.length === currentItemIds.length &&
+					outfitItemIds.every(
+						(id, index) => id === currentItemIds[index]
+					)
+				);
+			})) ||
+		false;
+
+	const handleSaveOutfit = async () => {
+		if (!outfitSuggestion?.items || !savedOutfitName.trim()) return;
+
+		setIsSaving(true);
+		try {
+			await saveOutfit({
+				name: savedOutfitName,
+				description: `AI-generated outfit for ${selectedDay}`,
+				wardrobeItemIds: outfitSuggestion.items.map(
+					(item) => item._id as any
+				),
+				tags: ["ai-generated", selectedDay.toLowerCase()],
+				occasion: outfitSuggestion.metadata.occasion,
+				visibility: "PRIVATE",
+			});
+
+			setShowSaveDialog(false);
+			setSavedOutfitName("");
+			setIsSaving(false);
+
+			// Show success toast
+			toast.success("Outfit saved successfully!", {
+				description: `"${savedOutfitName}" has been added to your wardrobe`,
+				duration: 3000,
+			});
+
+			// Show "Saved!" state temporarily
+			setJustSaved(true);
+			setTimeout(() => setJustSaved(false), 2000);
+		} catch (error) {
+			console.error("Failed to save outfit:", error);
+			setIsSaving(false);
+
+			// Show error toast
+			toast.error("Failed to save outfit", {
+				description: "Please try again later",
+				duration: 4000,
+			});
+		}
+	};
+
+	const handleRefreshOutfit = () => {
+		setIsGenerating(true);
+
+		// Show loading toast
+		toast.loading("Generating new outfit suggestion...", {
+			duration: 1000,
+		});
+
+		// Force re-query by invalidating the cache
+		setTimeout(() => {
+			setIsGenerating(false);
+			toast.success("New outfit generated!", {
+				description: "Fresh style suggestions ready for you",
+				duration: 2000,
+			});
+		}, 1000);
+	};
+
+	if (!outfitSuggestion) {
+		return (
+			<Card className="bg-primary/5 border-primary/20 relative overflow-hidden">
+				<CardHeader className="pt-6">
+					<CardTitle className="text-lg">
+						Generating Your Perfect Look...
+					</CardTitle>
+					<CardDescription>
+						<div className="flex items-center gap-2">
+							<RefreshCw className="w-4 h-4 animate-spin" />
+							Creating personalized outfit suggestion
+						</div>
+					</CardDescription>
+				</CardHeader>
+			</Card>
+		);
+	}
+
+	const { items, metadata } = outfitSuggestion;
+	const isAIGenerated = metadata.isAIGenerated;
+	const sustainabilityScore = metadata.sustainabilityScore;
+	const estimatedCost = metadata.totalCost;
+	const comfortLevel = Math.min(
+		100,
+		Math.max(50, 100 - metadata.avgWearCount)
+	); // Comfort based on wear frequency
 
 	return (
 		<Card className="bg-primary/5 border-primary/20 relative overflow-hidden">
@@ -77,21 +190,31 @@ export function TodaysRecommendationCard({
 						</CardTitle>
 						<CardDescription className="flex items-center gap-2 mt-1">
 							<Cloud className="w-4 h-4" />
-							{selectedDayOutfit?.day},{" "}
-							{new Date(
-								selectedDayOutfit?.date || "2025-08-21"
-							).toLocaleDateString("en-US", {
+							{selectedDay},{" "}
+							{new Date().toLocaleDateString("en-US", {
 								month: "long",
 								day: "numeric",
 							})}{" "}
-							• {selectedDayOutfit?.weather}
+							• {metadata.weather}
 						</CardDescription>
 					</div>
-					<div className="flex items-center gap-1">
-						<Star className="w-5 h-5 text-yellow-500" />
-						<span className="text-lg font-bold">
-							{selectedDayOutfit?.recommendedOutfit.confidence}%
-						</span>
+					<div className="flex items-center gap-2">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={handleRefreshOutfit}
+							disabled={isGenerating}
+						>
+							<RefreshCw
+								className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`}
+							/>
+						</Button>
+						<div className="flex items-center gap-1">
+							<Star className="w-5 h-5 text-yellow-500" />
+							<span className="text-lg font-bold">
+								{comfortLevel}%
+							</span>
+						</div>
 					</div>
 				</div>
 
@@ -100,242 +223,248 @@ export function TodaysRecommendationCard({
 					{sustainabilityScore > 0 && (
 						<Badge variant="outline" className="text-xs">
 							<Leaf className="w-3 h-3 mr-1" />
-							{sustainabilityScore}% Eco
+							{sustainabilityScore.toFixed(0)}% Eco
 						</Badge>
 					)}
 					{comfortLevel > 0 && (
 						<Badge variant="outline" className="text-xs">
 							<TrendingUp className="w-3 h-3 mr-1" />
-							{comfortLevel}/5 Comfort
+							{comfortLevel}% Comfort
 						</Badge>
 					)}
 					{estimatedCost > 0 && (
 						<Badge variant="outline" className="text-xs">
 							<DollarSign className="w-3 h-3 mr-1" />$
-							{estimatedCost}
+							{estimatedCost.toFixed(0)}
 						</Badge>
 					)}
 				</div>
 			</CardHeader>
-			<CardContent className="p-6">
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-					{/* Enhanced Outfit Template */}
-					<div className="relative mx-auto md:mx-0 p-2">
-						<div className="w-full max-w-xs h-80 bg-gradient-to-b from-background to-muted/30 rounded-xl border border-border shadow-sm relative">
-							{/* Top Wear */}
-							<div className="absolute inset-6 grid grid-cols-2 gap-4">
-								{/* Top Wear */}
-								<div className="bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 p-3">
-									<div className="text-center">
-										<User className="w-10 h-10 mx-auto mb-2 text-primary/70" />
-										<span className="text-sm text-primary font-semibold">
-											Tee
-										</span>
-									</div>
-								</div>
 
-								{/* Bottom Wear */}
-								<div className="bg-secondary/10 rounded-xl flex items-center justify-center border border-secondary/20 p-3">
-									<div className="text-center">
-										<Shield className="w-10 h-10 mx-auto mb-2 text-secondary/70" />
-										<span className="text-sm text-secondary font-semibold">
-											Jeans
-										</span>
+			<CardContent className="space-y-6">
+				{/* Outfit Items Grid */}
+				<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+					{items.map((item, index) => (
+						<div
+							key={item._id}
+							className="group relative bg-background rounded-lg border p-2 hover:shadow-md transition-shadow"
+						>
+							<div className="aspect-square bg-muted rounded-md mb-2 overflow-hidden">
+								{item.imageUrl ? (
+									<img
+										src={item.imageUrl}
+										alt={item.customName || "Wardrobe item"}
+										className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+									/>
+								) : (
+									<div className="w-full h-full flex items-center justify-center">
+										<Palette className="w-8 h-8 text-muted-foreground" />
 									</div>
-								</div>
-
-								{/* Footwear */}
-								<div className="bg-accent/10 rounded-xl flex items-center justify-center border border-accent/20 p-3">
-									<div className="text-center">
-										<Palette className="w-10 h-10 mx-auto mb-2 text-accent/70" />
-										<span className="text-sm text-accent font-semibold">
-											Shoes
-										</span>
-									</div>
-								</div>
-
-								{/* Optional Accessory */}
-								<div className="bg-muted/30 rounded-xl flex items-center justify-center border border-muted-foreground/10 opacity-60 p-3">
-									<div className="text-center">
-										<Plus className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
-										<span className="text-xs text-muted-foreground/50 font-medium">
-											Optional
-										</span>
-									</div>
-								</div>
+								)}
 							</div>
-
-							{/* Outfit Name Badge */}
-							<div className="absolute bottom-4 left-4 right-4">
-								<div className="bg-background/95 backdrop-blur-sm rounded-lg px-4 py-3 border border-border/60 shadow-sm">
-									<p className="text-base font-semibold text-center">
-										{
-											selectedDayOutfit?.recommendedOutfit
-												.name
-										}
-									</p>
-								</div>
+							<div className="space-y-1">
+								<p className="text-xs font-medium line-clamp-1">
+									{item.customName || "Untitled Item"}
+								</p>
+								<p className="text-xs text-muted-foreground capitalize">
+									{item.aiCategory || "Item"}
+								</p>
+							</div>
+							{/* Category indicator */}
+							<div className="absolute top-1 left-1">
+								<div
+									className={`w-3 h-3 rounded-full ${
+										index === 0
+											? "bg-blue-500"
+											: index === 1
+												? "bg-green-500"
+												: index === 2
+													? "bg-purple-500"
+													: "bg-orange-500"
+									}`}
+								></div>
 							</div>
 						</div>
+					))}
+				</div>
 
-						{/* Confidence Badge - Positioned outside container */}
-						<div className="absolute -top-1 -right-1">
-							<Badge className="text-xs px-3 py-1 font-semibold shadow-sm">
-								{
-									selectedDayOutfit?.recommendedOutfit
-										.confidence
-								}
-								% Match
-							</Badge>
+				{/* Outfit Insights */}
+				<div className="space-y-3">
+					<div className="grid grid-cols-3 gap-3">
+						<div className="text-center p-3 bg-muted/50 rounded-lg">
+							<DollarSign className="w-4 h-4 mx-auto mb-1 text-green-600" />
+							<p className="text-xs text-muted-foreground">
+								Total Cost
+							</p>
+							<p className="text-sm font-semibold">
+								${estimatedCost.toFixed(0)}
+							</p>
+						</div>
+						<div className="text-center p-3 bg-muted/50 rounded-lg">
+							<Leaf className="w-4 h-4 mx-auto mb-1 text-green-600" />
+							<p className="text-xs text-muted-foreground">
+								Eco Score
+							</p>
+							<p className="text-sm font-semibold">
+								{sustainabilityScore.toFixed(0)}%
+							</p>
+						</div>
+						<div className="text-center p-3 bg-muted/50 rounded-lg">
+							<Star className="w-4 h-4 mx-auto mb-1 text-yellow-600" />
+							<p className="text-xs text-muted-foreground">
+								Comfort
+							</p>
+							<p className="text-sm font-semibold">
+								{comfortLevel}%
+							</p>
 						</div>
 					</div>
 
-					{/* Outfit Details */}
-					<div className="space-y-4">
-						<div>
-							<h3 className="text-xl font-bold mb-2">
-								{selectedDayOutfit?.recommendedOutfit.name}
-							</h3>
-							<p className="text-muted-foreground">
-								{selectedDayOutfit?.recommendedOutfit.reason}
-							</p>
-						</div>
-
-						<div className="space-y-2">
-							<h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-								{selectedDay === "Wednesday"
-									? "Today's"
-									: `${selectedDay}'s`}{" "}
-								Items
-							</h4>
-							<div className="space-y-2">
-								{selectedDayOutfit?.recommendedOutfit.items.map(
-									(item, index) => (
-										<div
-											key={index}
-											className="flex items-center gap-3"
-										>
-											<div
-												className={`w-3 h-3 rounded-full border ${
-													index === 0
-														? "bg-primary/20 border-primary/40"
-														: index === 1
-															? "bg-secondary/20 border-secondary/40"
-															: "bg-accent/20 border-accent/40"
-												}`}
-											></div>
-											<span className="text-sm">
-												{item}
-											</span>
-										</div>
-									)
+					{/* AI Insights */}
+					{isAIGenerated && (
+						<div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+							<div className="flex items-center gap-2 mb-3">
+								<Brain className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+								<h4 className="text-sm font-semibold text-purple-800 dark:text-purple-200">
+									AI Styling Notes
+								</h4>
+							</div>
+							<div className="space-y-2 text-sm text-purple-700 dark:text-purple-300">
+								<p>
+									• Perfect for {metadata.occasion} occasions
+								</p>
+								<p>
+									• Weather-appropriate for {metadata.weather}{" "}
+									conditions
+								</p>
+								<p>
+									•{" "}
+									{sustainabilityScore > 70
+										? "Highly sustainable"
+										: "Moderately sustainable"}{" "}
+									choice
+								</p>
+								{estimatedCost > 200 && (
+									<p>• Premium outfit with quality pieces</p>
 								)}
 							</div>
 						</div>
+					)}
+				</div>
 
-						{/* AI Insights Section */}
-						{isAIGenerated && (
-							<div className="space-y-2 bg-purple-100/50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
-								<h4 className="text-sm font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
-									<Zap className="w-4 h-4" />
-									AI Insights
-								</h4>
-								<p className="text-sm text-purple-700 dark:text-purple-300">
-									{userPreferences?.stylePreferences &&
-									userPreferences.stylePreferences.length > 0
-										? `This outfit matches your ${userPreferences.stylePreferences.slice(0, 2).join(" and ")} style${userPreferences.stylePreferences.length > 2 ? " preferences" : ""}, weather conditions, and scheduled activities.`
-										: "This outfit is perfectly tailored to your style preferences, weather conditions, and scheduled activities."}
-								</p>
-								<div className="grid grid-cols-2 gap-2 mt-2">
-									<div className="text-xs">
-										<span className="font-medium">
-											Style Match:
-										</span>{" "}
-										{userPreferences?.stylePreferences
-											?.length
-											? Math.min(
-													95 +
-														userPreferences
-															.stylePreferences
-															.length *
-															2,
-													99
-												)
-											: 95}
-										%
-									</div>
-									<div className="text-xs">
-										<span className="font-medium">
-											Comfort Score:
-										</span>{" "}
-										{userPreferences?.bodyType
-											? Math.min(comfortLevel + 1, 5)
-											: comfortLevel}
-										/5
-									</div>
-								</div>
-								{userPreferences?.stylePreferences &&
-									userPreferences.stylePreferences.length >
-										0 && (
-										<div className="mt-2">
-											<div className="text-xs font-medium text-purple-800 mb-1">
-												Your Style:
-											</div>
-											<div className="flex flex-wrap gap-1">
-												{userPreferences.stylePreferences
-													.slice(0, 3)
-													.map((style, index) => (
-														<Badge
-															key={index}
-															variant="outline"
-															className="text-xs bg-purple-100 text-purple-700 border-purple-300"
-														>
-															{style}
-														</Badge>
-													))}
-											</div>
-										</div>
-									)}
+				{/* Status indicators */}
+				{(isOutfitSaved || justSaved) && (
+					<div className="flex items-center gap-2 mb-3">
+						<div className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md text-xs">
+							<Heart className="h-3 w-3 fill-current" />
+							{justSaved ? "Saved!" : "Saved"}
+						</div>
+					</div>
+				)}
+
+				{/* Action Buttons */}
+				<div className="flex gap-2 pt-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={handleRefreshOutfit}
+						disabled={isGenerating}
+						className="flex-1"
+					>
+						<RefreshCw
+							className={`w-4 h-4 mr-2 ${isGenerating ? "animate-spin" : ""}`}
+						/>
+						New Suggestion
+					</Button>
+					<Button
+						size="sm"
+						onClick={() => {
+							if (isOutfitSaved || justSaved) {
+								toast.warning("Outfit already saved", {
+									description:
+										"This outfit combination is already in your wardrobe",
+									duration: 3000,
+								});
+							} else {
+								setShowSaveDialog(true);
+							}
+						}}
+						disabled={false}
+						className="flex-1"
+						variant={
+							isOutfitSaved || justSaved ? "outline" : "default"
+						}
+					>
+						<Heart
+							className={`w-4 h-4 mr-2 ${isOutfitSaved ? "fill-current" : ""}`}
+						/>
+						{justSaved
+							? "Saved!"
+							: isOutfitSaved
+								? "Already Saved"
+								: "Save Outfit"}
+					</Button>
+				</div>
+
+				{/* Save Dialog */}
+				{showSaveDialog && (
+					<div className="border rounded-lg p-4 bg-background">
+						<h4 className="font-semibold mb-3">Save This Outfit</h4>
+						{isOutfitSaved && (
+							<div className="text-sm text-amber-600 mb-3 p-2 bg-amber-50 rounded border">
+								⚠️ This outfit combination is already saved.
+								Saving again will create a duplicate.
 							</div>
 						)}
-
-						{/* Schedule for selected day */}
-						{selectedDayOutfit?.schedule &&
-							selectedDayOutfit.schedule.length > 0 && (
-								<div className="space-y-2">
-									<h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-										<Clock className="w-4 h-4" />
-										{selectedDay === "Wednesday"
-											? "Today's"
-											: `${selectedDay}'s`}{" "}
-										Schedule
-									</h4>
-									<div className="space-y-1">
-										{selectedDayOutfit.schedule
-											.slice(0, 3)
-											.map((event, index) => (
-												<div
-													key={index}
-													className="flex items-center gap-2 text-sm text-muted-foreground"
-												>
-													<div className="w-2 h-2 bg-primary/60 rounded-full"></div>
-													{event}
-												</div>
-											))}
-										{selectedDayOutfit.schedule.length >
-											3 && (
-											<div className="text-xs text-muted-foreground italic pl-4">
-												+
-												{selectedDayOutfit.schedule
-													.length - 3}{" "}
-												more events
-											</div>
-										)}
-									</div>
-								</div>
-							)}
+						<div className="space-y-3">
+							<input
+								type="text"
+								placeholder="Enter outfit name..."
+								value={savedOutfitName}
+								onChange={(e) =>
+									setSavedOutfitName(e.target.value)
+								}
+								className="w-full px-3 py-2 border rounded-md text-sm"
+								autoFocus
+								disabled={isSaving}
+							/>
+							<div className="flex gap-2">
+								<Button
+									size="sm"
+									onClick={handleSaveOutfit}
+									disabled={
+										!savedOutfitName.trim() || isSaving
+									}
+									className="flex-1"
+								>
+									{isSaving ? (
+										<>
+											<RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+											Saving...
+										</>
+									) : (
+										<>
+											<Save className="w-4 h-4 mr-2" />
+											Save
+										</>
+									)}
+								</Button>
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => {
+										setShowSaveDialog(false);
+										setSavedOutfitName("");
+									}}
+									className="flex-1"
+									disabled={isSaving}
+								>
+									Cancel
+								</Button>
+							</div>
+						</div>
 					</div>
-				</div>
+				)}
 			</CardContent>
 		</Card>
 	);

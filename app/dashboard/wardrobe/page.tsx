@@ -6,12 +6,11 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
-import { wardrobeData, WARDROBE_CATEGORIES } from "@/data";
+import { Plus, Calendar } from "lucide-react";
+import { WARDROBE_CATEGORIES } from "@/data";
 import {
 	TodaysRecommendationCard,
 	AnalyticsCard,
-	DaySwitcher,
 	WeeklyProgress,
 	WeeklyOverview,
 	CategoryFilter,
@@ -41,7 +40,6 @@ export default function WardrobePage() {
 
 	// Use Convex data if available, fallback to static data for other features
 	const wardrobeItems = convexWardrobeItems || [];
-	const staticData = wardrobeData; // Keep for outfits, weekly plan etc.
 
 	// Transform Convex data to match expected interface
 	const transformedWardrobeItems = wardrobeItems.map((item) => ({
@@ -99,11 +97,6 @@ export default function WardrobePage() {
 					(item) => item.category === selectedCategory
 				);
 
-	// Get selected day's outfit data (still using static data for now)
-	const selectedDayOutfit =
-		staticData.weeklyPlan.find((dayPlan) => dayPlan.day === selectedDay) ||
-		staticData.weeklyPlan.find((dayPlan) => dayPlan.day === "Wednesday"); // Fallback to Wednesday
-
 	// Show loading state while user data is loading
 	if (
 		!clerkUser ||
@@ -134,14 +127,40 @@ export default function WardrobePage() {
 						}
 						subtitle="Manage your wardrobe and create amazing outfits tailored to your style."
 					>
-						<DaySwitcher
-							weeklyPlan={staticData.weeklyPlan}
-							selectedDay={selectedDay}
-							onDaySelect={setSelectedDay}
-						/>
+						<div className="mb-6">
+							<div className="flex items-center gap-2 mb-3">
+								<Calendar className="w-4 h-4 text-muted-foreground" />
+								<span className="text-sm font-medium text-muted-foreground">
+									View outfit for:
+								</span>
+							</div>
+							<div className="flex flex-wrap gap-2">
+								{[
+									"Monday",
+									"Tuesday",
+									"Wednesday",
+									"Thursday",
+									"Friday",
+									"Saturday",
+									"Sunday",
+								].map((day) => (
+									<Button
+										key={day}
+										variant={
+											selectedDay === day
+												? "default"
+												: "outline"
+										}
+										size="sm"
+										onClick={() => setSelectedDay(day)}
+									>
+										{day}
+									</Button>
+								))}
+							</div>
+						</div>
 						<TodaysRecommendationCard
 							selectedDay={selectedDay}
-							selectedDayOutfit={selectedDayOutfit}
 							userPreferences={convexUser}
 						/>
 					</WelcomeSection>
@@ -214,12 +233,12 @@ export default function WardrobePage() {
 				</TabsContent>
 
 				<TabsContent value="outfits" className="space-y-6">
-					<OutfitGrid outfits={staticData.outfits} />
+					<OutfitGrid />
 				</TabsContent>
 
 				<TabsContent value="weekly" className="space-y-6">
 					<WeeklyOverview />
-					<WeeklyPlanGrid weeklyPlan={staticData.weeklyPlan} />
+					<WeeklyPlanGrid />
 				</TabsContent>
 
 				<TabsContent value="wishlist" className="space-y-6">
