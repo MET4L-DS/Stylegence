@@ -3,7 +3,7 @@ import { mutation, query } from "./_generated/server";
 import { getCurrentUserOrThrow } from "./users";
 
 /**
- * Add a user-uploaded item to the wardrobe
+ * Add a user-uploaded item to the wardrobe with image support
  */
 export const addUserUploadedItem = mutation({
 	args: {
@@ -16,7 +16,8 @@ export const addUserUploadedItem = mutation({
 		purchaseCurrency: v.optional(v.string()),
 		notes: v.optional(v.string()),
 		visibility: v.optional(v.string()),
-		imageUrl: v.string(),
+		imageUrl: v.optional(v.string()), // Legacy support
+		imageStorageId: v.optional(v.id("_storage")), // New Convex storage
 		tags: v.optional(v.array(v.string())),
 	},
 	handler: async (ctx, args) => {
@@ -36,6 +37,13 @@ export const addUserUploadedItem = mutation({
 			aiTags.push(`notes:${args.notes.trim()}`);
 		}
 
+		// Get image URL from storage if storageId provided
+		let finalImageUrl = args.imageUrl;
+		if (args.imageStorageId) {
+			const storageUrl = await ctx.storage.getUrl(args.imageStorageId);
+			finalImageUrl = storageUrl || undefined;
+		}
+
 		const wardrobeItem = await ctx.db.insert("wardrobeItems", {
 			userId: user._id,
 			sourceType: "USER_UPLOADED",
@@ -43,7 +51,8 @@ export const addUserUploadedItem = mutation({
 			addedDate: Date.now(),
 			purchasePrice: args.purchasePrice,
 			purchaseCurrency: args.purchaseCurrency || "USD",
-			imageUrl: args.imageUrl,
+			imageStorageId: args.imageStorageId,
+			imageUrl: finalImageUrl,
 			aiCategory: args.category,
 			aiTags: aiTags,
 			dominantColors: args.color ? [args.color] : [],
@@ -64,7 +73,7 @@ export const addUserUploadedItem = mutation({
 });
 
 /**
- * Get all wardrobe items for the current user
+ * Get all wardrobe items for the current user with resolved image URLs
  */
 export const getUserWardrobeItems = query({
 	args: {},
@@ -76,7 +85,27 @@ export const getUserWardrobeItems = query({
 			.withIndex("byUser", (q) => q.eq("userId", user._id))
 			.collect();
 
-		return items;
+		// Resolve image URLs from storage IDs
+		const itemsWithImages = await Promise.all(
+			items.map(async (item) => {
+				let imageUrl = item.imageUrl;
+
+				// If we have a storage ID, get the current URL
+				if (item.imageStorageId) {
+					const storageUrl = await ctx.storage.getUrl(
+						item.imageStorageId
+					);
+					imageUrl = storageUrl || item.imageUrl;
+				}
+
+				return {
+					...item,
+					imageUrl,
+				};
+			})
+		);
+
+		return itemsWithImages;
 	},
 });
 

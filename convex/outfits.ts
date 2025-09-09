@@ -161,8 +161,28 @@ export const generateOutfitSuggestion = query({
 			outfitItems.length;
 		const sustainabilityScore = Math.min(100, avgWearCount * 15); // Simple sustainability calculation
 
+		// Resolve image URLs for outfit items
+		const itemsWithImages = await Promise.all(
+			outfitItems.map(async (item) => {
+				let imageUrl = item.imageUrl;
+
+				// If we have a storage ID, get the current URL
+				if (item.imageStorageId) {
+					const storageUrl = await ctx.storage.getUrl(
+						item.imageStorageId
+					);
+					imageUrl = storageUrl || item.imageUrl;
+				}
+
+				return {
+					...item,
+					imageUrl,
+				};
+			})
+		);
+
 		return {
-			items: outfitItems,
+			items: itemsWithImages,
 			metadata: {
 				totalCost,
 				avgWearCount,
@@ -240,7 +260,23 @@ export const getUserOutfits = query({
 				const wardrobeItems = await Promise.all(
 					outfitItems.map(async (outfitItem) => {
 						if (outfitItem.wardrobeItemId) {
-							return await ctx.db.get(outfitItem.wardrobeItemId);
+							const item = await ctx.db.get(
+								outfitItem.wardrobeItemId
+							);
+							if (item) {
+								// Resolve image URL from storage if available
+								let imageUrl = item.imageUrl;
+								if (item.imageStorageId) {
+									const storageUrl = await ctx.storage.getUrl(
+										item.imageStorageId
+									);
+									imageUrl = storageUrl || item.imageUrl;
+								}
+								return {
+									...item,
+									imageUrl,
+								};
+							}
 						}
 						return null;
 					})

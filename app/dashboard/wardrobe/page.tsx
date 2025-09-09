@@ -73,7 +73,7 @@ export default function WardrobePage() {
 			item.aiTags
 				?.find((tag) => tag.startsWith("brand:"))
 				?.replace("brand:", "") || "Unknown",
-		image: item.imageUrl || "/api/placeholder/200/300",
+		image: item.imageUrl || undefined,
 		tags:
 			item.aiTags?.filter(
 				(tag) =>

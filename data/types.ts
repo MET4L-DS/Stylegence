@@ -68,7 +68,7 @@ export interface WardrobeItem {
 	category: string;
 	color: string;
 	brand: string;
-	image: string;
+	image?: string;
 	tags: string[];
 	timesWorn?: number;
 	lastWorn?: string;

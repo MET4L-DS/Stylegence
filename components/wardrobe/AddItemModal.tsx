@@ -27,6 +27,7 @@ import { Separator } from "@/components/ui/separator";
 import { Upload, X, Camera, Plus, Loader2, Tag, Palette } from "lucide-react";
 import { toast } from "sonner";
 import { WARDROBE_CATEGORIES } from "@/data/constants";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 interface AddItemModalProps {
 	open: boolean;
@@ -99,8 +100,12 @@ const VISIBILITY_OPTIONS = [
 
 export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 	const [isLoading, setIsLoading] = useState(false);
-	const [selectedImage, setSelectedImage] = useState<File | null>(null);
-	const [imagePreview, setImagePreview] = useState<string | null>(null);
+	const [uploadedImageStorageId, setUploadedImageStorageId] = useState<
+		string | null
+	>(null);
+	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(
+		null
+	);
 	const [customTags, setCustomTags] = useState<string[]>([]);
 	const [newTag, setNewTag] = useState("");
 
@@ -119,32 +124,14 @@ export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 
 	const addWardrobeItem = useMutation(api.wardrobeItems.addUserUploadedItem);
 
-	const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
-		if (file) {
-			if (file.size > 10 * 1024 * 1024) {
-				// 10MB limit
-				toast.error("Image size must be less than 10MB");
-				return;
-			}
-
-			if (!file.type.startsWith("image/")) {
-				toast.error("Please select a valid image file");
-				return;
-			}
-
-			setSelectedImage(file);
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				setImagePreview(e.target?.result as string);
-			};
-			reader.readAsDataURL(file);
-		}
+	const handleImageUploaded = (storageId: string, imageUrl: string) => {
+		setUploadedImageStorageId(storageId);
+		setUploadedImageUrl(imageUrl);
 	};
 
-	const handleRemoveImage = () => {
-		setSelectedImage(null);
-		setImagePreview(null);
+	const handleImageRemoved = () => {
+		setUploadedImageStorageId(null);
+		setUploadedImageUrl(null);
 	};
 
 	const handleAddTag = () => {
@@ -161,8 +148,8 @@ export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
 
-		if (!selectedImage) {
-			toast.error("Please select an image");
+		if (!uploadedImageStorageId || !uploadedImageUrl) {
+			toast.error("Please upload an image");
 			return;
 		}
 
@@ -179,10 +166,7 @@ export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 		setIsLoading(true);
 
 		try {
-			// Upload image to Convex storage
-			const imageUrl = await uploadImage(selectedImage);
-
-			// Create wardrobe item
+			// Create wardrobe item with uploaded image
 			await addWardrobeItem({
 				customName: formData.customName.trim(),
 				category: formData.category,
@@ -195,7 +179,8 @@ export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 				purchaseCurrency: formData.currency,
 				notes: formData.notes || undefined,
 				visibility: formData.visibility as any,
-				imageUrl,
+				imageStorageId: uploadedImageStorageId as any,
+				imageUrl: uploadedImageUrl,
 				tags: customTags,
 			});
 
@@ -213,13 +198,6 @@ export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 		}
 	};
 
-	const uploadImage = async (file: File): Promise<string> => {
-		// For now, return a placeholder URL
-		// In production, this would upload to Convex storage and return the storage URL
-		console.log("Uploading image:", file.name, file.size);
-		return "/api/placeholder/200/300";
-	};
-
 	const handleClose = () => {
 		// Reset form
 		setFormData({
@@ -233,8 +211,8 @@ export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 			notes: "",
 			visibility: "private",
 		});
-		setSelectedImage(null);
-		setImagePreview(null);
+		setUploadedImageStorageId(null);
+		setUploadedImageUrl(null);
 		setCustomTags([]);
 		setNewTag("");
 		onOpenChange(false);
@@ -266,45 +244,15 @@ export function AddItemModal({ open, onOpenChange }: AddItemModalProps) {
 									Item Photo *
 								</Label>
 								<div className="mt-2">
-									{imagePreview ? (
-										<div className="relative">
-											<img
-												src={imagePreview}
-												alt="Item preview"
-												className="w-full h-48 object-cover rounded-lg border"
-											/>
-											<Button
-												type="button"
-												variant="destructive"
-												size="sm"
-												className="absolute top-2 right-2"
-												onClick={handleRemoveImage}
-											>
-												<X className="w-4 h-4" />
-											</Button>
-										</div>
-									) : (
-										<label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-muted-foreground/25 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
-											<div className="flex flex-col items-center justify-center pt-5 pb-6">
-												<Camera className="w-8 h-8 mb-4 text-muted-foreground" />
-												<p className="mb-2 text-sm text-muted-foreground">
-													<span className="font-semibold">
-														Click to upload
-													</span>{" "}
-													or drag and drop
-												</p>
-												<p className="text-xs text-muted-foreground">
-													PNG, JPG, GIF up to 10MB
-												</p>
-											</div>
-											<input
-												type="file"
-												className="hidden"
-												accept="image/*"
-												onChange={handleImageSelect}
-											/>
-										</label>
-									)}
+									<ImageUpload
+										onImageUploaded={handleImageUploaded}
+										currentImage={
+											uploadedImageUrl || undefined
+										}
+										onImageRemoved={handleImageRemoved}
+										label="Upload Item Photo"
+										disabled={isLoading}
+									/>
 								</div>
 							</CardContent>
 						</Card>

@@ -9,6 +9,7 @@ import {
 	Star,
 	ShoppingBag,
 	Leaf,
+	ImageIcon,
 } from "lucide-react";
 
 interface WardrobeItemCardProps {
@@ -56,8 +57,29 @@ export function WardrobeItemCard({ item, onClick }: WardrobeItemCardProps) {
 			</div>
 
 			<CardContent className="p-4">
-				<div className="aspect-[3/4] bg-muted rounded-lg mb-4 flex items-center justify-center relative">
-					<span className="text-muted-foreground text-sm">Image</span>
+				<div className="aspect-[3/4] bg-muted rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+					{item.image || item.imageUrl ? (
+						<img
+							src={item.image || item.imageUrl}
+							alt={item.name}
+							className="w-full h-full object-cover transition-transform group-hover:scale-105"
+							onError={(e) => {
+								// Fallback to placeholder if image fails to load
+								const target = e.target as HTMLImageElement;
+								target.style.display = "none";
+								target.nextElementSibling?.classList.remove(
+									"hidden"
+								);
+							}}
+						/>
+					) : null}
+					{/* Fallback placeholder */}
+					<div
+						className={`flex flex-col items-center justify-center text-muted-foreground ${item.image || item.imageUrl ? "hidden" : ""}`}
+					>
+						<ImageIcon className="w-8 h-8 mb-2" />
+						<span className="text-sm">No Image</span>
+					</div>
 					{/* Favorited indicator */}
 					{isFavorited && (
 						<div className="absolute top-2 left-2">
