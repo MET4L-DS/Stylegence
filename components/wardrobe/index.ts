@@ -16,3 +16,4 @@ export { WelcomeSection } from "./WelcomeSection";
 export { AddItemModal } from "./AddItemModal";
 export { WardrobeMigrationPanel } from "./WardrobeMigrationPanel";
 export { WardrobeItemDetailModal } from "./WardrobeItemDetailModal";
+export { OutfitDetailModal } from "./OutfitDetailModal";

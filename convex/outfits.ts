@@ -541,3 +541,51 @@ export const generateWeeklyPlan = query({
 		return weeklyPlan;
 	},
 });
+
+/**
+ * Update an existing outfit
+ */
+export const updateOutfit = mutation({
+	args: {
+		outfitId: v.id("outfits"),
+		name: v.optional(v.string()),
+		description: v.optional(v.string()),
+		tags: v.optional(v.array(v.string())),
+		visibility: v.optional(
+			v.union(
+				v.literal("PUBLIC"),
+				v.literal("PRIVATE"),
+				v.literal("GROUP")
+			)
+		),
+	},
+	handler: async (ctx, args) => {
+		const user = await getCurrentUserOrThrow(ctx);
+
+		// Get the outfit to verify ownership
+		const outfit = await ctx.db.get(args.outfitId);
+		if (!outfit) {
+			throw new Error("Outfit not found");
+		}
+
+		if (outfit.userId !== user._id) {
+			throw new Error("You can only update your own outfits");
+		}
+
+		// Update the outfit
+		const updateData: any = {
+			updatedAt: Date.now(),
+		};
+
+		if (args.name !== undefined) updateData.name = args.name;
+		if (args.description !== undefined)
+			updateData.description = args.description;
+		if (args.tags !== undefined) updateData.tags = args.tags;
+		if (args.visibility !== undefined)
+			updateData.visibility = args.visibility;
+
+		await ctx.db.patch(args.outfitId, updateData);
+
+		return args.outfitId;
+	},
+});

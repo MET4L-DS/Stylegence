@@ -11,6 +11,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useState } from "react";
 import { toast } from "sonner";
+import { OutfitDetailModal } from "./OutfitDetailModal";
 import {
 	Cloud,
 	Star,
@@ -22,6 +23,7 @@ import {
 	RefreshCw,
 	Heart,
 	Save,
+	Eye,
 } from "lucide-react";
 
 interface TodaysRecommendationCardProps {
@@ -44,6 +46,7 @@ export function TodaysRecommendationCard({
 	const [showSaveDialog, setShowSaveDialog] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [justSaved, setJustSaved] = useState(false);
+	const [showOutfitDetail, setShowOutfitDetail] = useState(false);
 
 	// Get outfit suggestion from Convex
 	const outfitSuggestion = useQuery(api.outfits.generateOutfitSuggestion, {
@@ -377,6 +380,15 @@ export function TodaysRecommendationCard({
 						New Suggestion
 					</Button>
 					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => setShowOutfitDetail(true)}
+						className="flex-1"
+					>
+						<Eye className="w-4 h-4 mr-2" />
+						View Details
+					</Button>
+					<Button
 						size="sm"
 						onClick={() => {
 							if (isOutfitSaved || justSaved) {
@@ -466,6 +478,41 @@ export function TodaysRecommendationCard({
 					</div>
 				)}
 			</CardContent>
+
+			{/* Outfit Detail Modal */}
+			{outfitSuggestion && (
+				<OutfitDetailModal
+					open={showOutfitDetail}
+					onOpenChange={setShowOutfitDetail}
+					outfit={{
+						name: `${selectedDay}'s Outfit`,
+						description: "AI-generated outfit recommendation",
+						items: outfitSuggestion.items,
+						metadata: outfitSuggestion.metadata,
+						tags: ["ai-generated", selectedDay.toLowerCase()],
+						occasion:
+							selectedDay === "Saturday" ||
+							selectedDay === "Sunday"
+								? "weekend"
+								: "casual",
+					}}
+					context="recommendation"
+					dayInfo={{
+						day: selectedDay,
+						occasion:
+							selectedDay === "Saturday" ||
+							selectedDay === "Sunday"
+								? "weekend"
+								: "casual",
+						weather: "mild",
+					}}
+					onSaveOutfit={() => {
+						// Refresh the user outfits query to update the saved status
+						setJustSaved(true);
+						setTimeout(() => setJustSaved(false), 3000);
+					}}
+				/>
+			)}
 		</Card>
 	);
 }

@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { useState } from "react";
+import { OutfitDetailModal } from "./OutfitDetailModal";
 import {
 	Heart,
 	Calendar,
@@ -33,6 +35,8 @@ interface OutfitCardProps {
 }
 
 export function OutfitCard({ outfitId, onDelete }: OutfitCardProps) {
+	const [showOutfitDetail, setShowOutfitDetail] = useState(false);
+
 	// Get all user outfits and find the specific one
 	const allOutfits = useQuery(api.outfits.getUserOutfits, {});
 	const outfit = allOutfits?.find((o) => o._id === outfitId);
@@ -242,9 +246,14 @@ export function OutfitCard({ outfitId, onDelete }: OutfitCardProps) {
 
 				{/* Action Buttons */}
 				<div className="flex gap-2 pt-2">
-					<Button variant="outline" size="sm" className="flex-1">
+					<Button
+						variant="outline"
+						size="sm"
+						className="flex-1"
+						onClick={() => setShowOutfitDetail(true)}
+					>
 						<Eye className="w-4 h-4 mr-1" />
-						View
+						View Details
 					</Button>
 					<Button
 						variant="outline"
@@ -256,6 +265,46 @@ export function OutfitCard({ outfitId, onDelete }: OutfitCardProps) {
 					</Button>
 				</div>
 			</CardContent>
+
+			{/* Outfit Detail Modal */}
+			{outfit && (
+				<OutfitDetailModal
+					open={showOutfitDetail}
+					onOpenChange={setShowOutfitDetail}
+					outfit={{
+						_id: outfit._id,
+						name: outfit.name,
+						description: outfit.description,
+						items: outfit.items
+							.filter((item) => item !== null)
+							.map((item) => ({
+								_id: item!._id,
+								customName: item!.customName,
+								aiCategory: item!.aiCategory,
+								imageUrl: item!.imageUrl,
+								dominantColors: item!.dominantColors,
+								purchasePrice: item!.purchasePrice,
+								purchaseCurrency: item!.purchaseCurrency,
+								wearCount: item!.wearCount,
+								lastWornAt: item!.lastWornAt,
+								aiTags: item!.aiTags,
+							})),
+						tags: outfit.tags,
+						occasion: "casual", // Default value since it's not in the outfit object
+						visibility: outfit.visibility as
+							| "PUBLIC"
+							| "PRIVATE"
+							| "GROUP",
+						createdAt: outfit.createdAt,
+						lastWorn: undefined, // Not available in current outfit structure
+					}}
+					context="saved"
+					onDeleteOutfit={() => {
+						setShowOutfitDetail(false);
+						onDelete?.();
+					}}
+				/>
+			)}
 		</Card>
 	);
 }
