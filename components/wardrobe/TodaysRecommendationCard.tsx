@@ -174,7 +174,7 @@ export function TodaysRecommendationCard({
 				<div className="absolute top-4 left-4 z-10">
 					<Badge
 						variant="secondary"
-						className="bg-purple-100 text-purple-700 text-xs"
+						className="bg-chart-5/10 text-chart-5 border-chart-5/20 text-xs"
 					>
 						<Brain className="w-3 h-3 mr-1" />
 						AI Curated
@@ -213,7 +213,7 @@ export function TodaysRecommendationCard({
 							/>
 						</Button>
 						<div className="flex items-center gap-1">
-							<Star className="w-5 h-5 text-yellow-500" />
+							<Star className="w-5 h-5 text-chart-3" />
 							<span className="text-lg font-bold">
 								{comfortLevel}%
 							</span>
@@ -278,12 +278,12 @@ export function TodaysRecommendationCard({
 								<div
 									className={`w-3 h-3 rounded-full ${
 										index === 0
-											? "bg-blue-500"
+											? "bg-chart-1"
 											: index === 1
-												? "bg-green-500"
+												? "bg-chart-2"
 												: index === 2
-													? "bg-purple-500"
-													: "bg-orange-500"
+													? "bg-chart-3"
+													: "bg-chart-4"
 									}`}
 								></div>
 							</div>
@@ -295,7 +295,7 @@ export function TodaysRecommendationCard({
 				<div className="space-y-3">
 					<div className="grid grid-cols-3 gap-3">
 						<div className="text-center p-3 bg-muted/50 rounded-lg">
-							<DollarSign className="w-4 h-4 mx-auto mb-1 text-green-600" />
+							<DollarSign className="w-4 h-4 mx-auto mb-1 text-chart-1" />
 							<p className="text-xs text-muted-foreground">
 								Total Cost
 							</p>
@@ -304,7 +304,7 @@ export function TodaysRecommendationCard({
 							</p>
 						</div>
 						<div className="text-center p-3 bg-muted/50 rounded-lg">
-							<Leaf className="w-4 h-4 mx-auto mb-1 text-green-600" />
+							<Leaf className="w-4 h-4 mx-auto mb-1 text-chart-2" />
 							<p className="text-xs text-muted-foreground">
 								Eco Score
 							</p>
@@ -313,7 +313,7 @@ export function TodaysRecommendationCard({
 							</p>
 						</div>
 						<div className="text-center p-3 bg-muted/50 rounded-lg">
-							<Star className="w-4 h-4 mx-auto mb-1 text-yellow-600" />
+							<Star className="w-4 h-4 mx-auto mb-1 text-chart-3" />
 							<p className="text-xs text-muted-foreground">
 								Comfort
 							</p>
@@ -325,14 +325,14 @@ export function TodaysRecommendationCard({
 
 					{/* AI Insights */}
 					{isAIGenerated && (
-						<div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+						<div className="bg-chart-5/10 rounded-lg p-4 border border-chart-5/20">
 							<div className="flex items-center gap-2 mb-3">
-								<Brain className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-								<h4 className="text-sm font-semibold text-purple-800 dark:text-purple-200">
+								<Brain className="w-4 h-4 text-chart-5" />
+								<h4 className="text-sm font-semibold text-chart-5">
 									AI Styling Notes
 								</h4>
 							</div>
-							<div className="space-y-2 text-sm text-purple-700 dark:text-purple-300">
+							<div className="space-y-2 text-sm text-chart-5">
 								<p>
 									• Perfect for {metadata.occasion} occasions
 								</p>
@@ -358,7 +358,7 @@ export function TodaysRecommendationCard({
 				{/* Status indicators */}
 				{(isOutfitSaved || justSaved) && (
 					<div className="flex items-center gap-2 mb-3">
-						<div className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md text-xs">
+						<div className="flex items-center gap-1 px-2 py-1 bg-chart-2/10 text-chart-2 border border-chart-2/20 rounded-md text-xs">
 							<Heart className="h-3 w-3 fill-current" />
 							{justSaved ? "Saved!" : "Saved"}
 						</div>
@@ -423,7 +423,7 @@ export function TodaysRecommendationCard({
 					<div className="border rounded-lg p-4 bg-background">
 						<h4 className="font-semibold mb-3">Save This Outfit</h4>
 						{isOutfitSaved && (
-							<div className="text-sm text-amber-600 mb-3 p-2 bg-amber-50 rounded border">
+							<div className="text-sm text-chart-3 mb-3 p-2 bg-chart-3/10 rounded border border-chart-3/20">
 								⚠️ This outfit combination is already saved.
 								Saving again will create a duplicate.
 							</div>
