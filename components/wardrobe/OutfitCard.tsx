@@ -89,7 +89,7 @@ export function OutfitCard({ outfitId, onDelete }: OutfitCardProps) {
 				{isHighSustainability && (
 					<Badge
 						variant="secondary"
-						className="text-xs bg-green-100 text-green-700"
+						className="text-xs bg-chart-2/10 text-chart-2 border-chart-2/20"
 					>
 						<Leaf className="w-3 h-3" />
 					</Badge>
@@ -97,7 +97,7 @@ export function OutfitCard({ outfitId, onDelete }: OutfitCardProps) {
 				{isAIRecommended && (
 					<Badge
 						variant="secondary"
-						className="text-xs bg-purple-100 text-purple-700"
+						className="text-xs bg-chart-5/10 text-chart-5 border-chart-5/20"
 					>
 						<Zap className="w-3 h-3" />
 					</Badge>
@@ -117,7 +117,7 @@ export function OutfitCard({ outfitId, onDelete }: OutfitCardProps) {
 						</CardDescription>
 					</div>
 					<div className="flex items-center gap-1">
-						<Star className="w-3 h-3 text-yellow-500" />
+						<Star className="w-3 h-3 text-chart-3" />
 						<span className="text-xs font-medium">
 							{comfortLevel}%
 						</span>

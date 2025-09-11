@@ -142,28 +142,19 @@ export function WeeklyPlanCard({ dayPlan }: WeeklyPlanCardProps) {
 			{/* Enhanced Status Indicators */}
 			<div className="absolute top-3 right-3 z-10 flex gap-1">
 				{(isOutfitSaved || justSaved) && (
-					<Badge
-						variant="secondary"
-						className="text-xs bg-blue-100 text-blue-700"
-					>
+					<Badge variant="secondary" className="text-xs">
 						<Heart className="w-3 h-3 fill-current mr-1" />
 						Saved
 					</Badge>
 				)}
 				{isHighSustainability && (
-					<Badge
-						variant="secondary"
-						className="text-xs bg-green-100 text-green-700"
-					>
+					<Badge variant="secondary" className="text-xs">
 						<Leaf className="w-3 h-3 mr-1" />
 						Eco
 					</Badge>
 				)}
 				{isAIRecommended && (
-					<Badge
-						variant="secondary"
-						className="text-xs bg-purple-100 text-purple-700"
-					>
+					<Badge variant="secondary" className="text-xs">
 						<Zap className="w-3 h-3 mr-1" />
 						AI
 					</Badge>
@@ -180,9 +171,9 @@ export function WeeklyPlanCard({ dayPlan }: WeeklyPlanCardProps) {
 							{new Date().toLocaleDateString()}
 						</CardDescription>
 					</div>
-					<div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-200">
-						<Star className="w-4 h-4 text-yellow-500" />
-						<span className="text-sm font-semibold text-yellow-700">
+					<div className="flex items-center gap-1 bg-chart-3/10 px-2 py-1 rounded-full border border-chart-3/20">
+						<Star className="w-4 h-4 text-chart-3" />
+						<span className="text-sm font-semibold text-chart-3">
 							{comfortLevel}%
 						</span>
 					</div>
@@ -296,30 +287,30 @@ export function WeeklyPlanCard({ dayPlan }: WeeklyPlanCardProps) {
 
 					{/* Enhanced Stats Grid */}
 					<div className="grid grid-cols-3 gap-3">
-						<div className="text-center p-3 bg-gradient-to-b from-green-50 to-green-100 rounded-lg border border-green-200">
-							<DollarSign className="w-5 h-5 mx-auto mb-1 text-green-600" />
-							<span className="text-xs text-green-700 font-medium block">
+						<div className="text-center p-3 bg-chart-1/10 rounded-lg border border-chart-1/20">
+							<DollarSign className="w-5 h-5 mx-auto mb-1 text-chart-1" />
+							<span className="text-xs text-chart-1 font-medium block">
 								Total Cost
 							</span>
-							<p className="text-sm font-bold text-green-800">
+							<p className="text-sm font-bold text-chart-1">
 								${totalCost.toFixed(0)}
 							</p>
 						</div>
-						<div className="text-center p-3 bg-gradient-to-b from-emerald-50 to-emerald-100 rounded-lg border border-emerald-200">
-							<Leaf className="w-5 h-5 mx-auto mb-1 text-emerald-600" />
-							<span className="text-xs text-emerald-700 font-medium block">
+						<div className="text-center p-3 bg-chart-2/10 rounded-lg border border-chart-2/20">
+							<Leaf className="w-5 h-5 mx-auto mb-1 text-chart-2" />
+							<span className="text-xs text-chart-2 font-medium block">
 								Eco Score
 							</span>
-							<p className="text-sm font-bold text-emerald-800">
+							<p className="text-sm font-bold text-chart-2">
 								{sustainabilityScore.toFixed(0)}%
 							</p>
 						</div>
-						<div className="text-center p-3 bg-gradient-to-b from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
-							<Star className="w-5 h-5 mx-auto mb-1 text-yellow-600" />
-							<span className="text-xs text-yellow-700 font-medium block">
+						<div className="text-center p-3 bg-chart-3/10 rounded-lg border border-chart-3/20">
+							<Star className="w-5 h-5 mx-auto mb-1 text-chart-3" />
+							<span className="text-xs text-chart-3 font-medium block">
 								Comfort
 							</span>
-							<p className="text-sm font-bold text-yellow-800">
+							<p className="text-sm font-bold text-chart-3">
 								{comfortLevel.toFixed(0)}%
 							</p>
 						</div>

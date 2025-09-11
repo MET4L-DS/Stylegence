@@ -59,20 +59,16 @@ export function AnalyticsCard({
 		icon,
 		label,
 		value,
-		color = "primary",
 		subtitle,
 	}: {
 		icon: React.ReactNode;
 		label: string;
 		value: string | number;
-		color?: string;
 		subtitle?: string;
 	}) => (
-		<div className="flex items-center justify-between p-3 rounded-lg border bg-background/50 dark:bg-gray-900/50 hover:bg-accent/50 transition-colors min-w-0">
+		<div className="flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-accent/50 transition-colors min-w-0">
 			<div className="flex items-center gap-3 min-w-0 flex-1">
-				<div
-					className={`w-8 h-8 bg-${color}-100 dark:bg-${color}-900/20 rounded-full flex items-center justify-center flex-shrink-0`}
-				>
+				<div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
 					{icon}
 				</div>
 				<div className="min-w-0 flex-1">
@@ -116,65 +112,57 @@ export function AnalyticsCard({
 					<TabsContent value="overview" className="space-y-4 mt-4">
 						<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
 							<StatItem
-								icon={<Tag className="w-4 h-4 text-blue-600" />}
+								icon={<Tag className="w-4 h-4 text-primary" />}
 								label="Total Items"
 								value={totalItems}
-								color="blue"
 								subtitle="Your complete wardrobe"
 							/>
 							<StatItem
 								icon={
-									<Activity className="w-4 h-4 text-green-600" />
+									<Activity className="w-4 h-4 text-chart-1" />
 								}
 								label="Weekly Active"
 								value={timeBasedStats.weeklyWorn}
-								color="green"
 								subtitle="Items worn this week"
 							/>
 							<StatItem
 								icon={
-									<TrendingUp className="w-4 h-4 text-purple-600" />
+									<TrendingUp className="w-4 h-4 text-chart-2" />
 								}
 								label="Monthly Active"
 								value={timeBasedStats.monthlyWorn}
-								color="purple"
 								subtitle="Items worn this month"
 							/>
 							<StatItem
 								icon={
-									<Target className="w-4 h-4 text-orange-600" />
+									<Target className="w-4 h-4 text-chart-3" />
 								}
 								label="Repeat Rate"
 								value={`${usageStats.repeatPercentage}%`}
-								color="orange"
 								subtitle="Items worn multiple times"
 							/>
 							<StatItem
 								icon={
-									<DollarSign className="w-4 h-4 text-emerald-600" />
+									<DollarSign className="w-4 h-4 text-chart-4" />
 								}
 								label="Avg Cost/Wear"
 								value={`$${usageStats.costPerWear.average.toFixed(2)}`}
-								color="emerald"
 								subtitle="Cost efficiency"
 							/>
 							<StatItem
-								icon={
-									<Leaf className="w-4 h-4 text-teal-600" />
-								}
+								icon={<Leaf className="w-4 h-4 text-chart-5" />}
 								label="Sustainability Score"
 								value={`${sustainabilityStats.sustainabilityScore.toFixed(0)}%`}
-								color="teal"
 								subtitle="Environmental impact"
 							/>
 						</div>
 
 						{/* Personalized Insights */}
 						{userPreferences && (
-							<div className="bg-gradient-to-r from-blue-100/50 to-purple-100/50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+							<div className="bg-gradient-to-r from-primary/10 to-accent/20 rounded-lg p-4 border">
 								<div className="flex items-center gap-2 mb-3">
-									<Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-									<span className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+									<Sparkles className="w-4 h-4 text-primary" />
+									<span className="text-sm font-semibold text-foreground">
 										Personalized Insights
 									</span>
 								</div>
@@ -183,7 +171,7 @@ export function AnalyticsCard({
 										userPreferences.stylePreferences
 											.length > 0 && (
 											<div className="space-y-2">
-												<div className="font-medium text-blue-700">
+												<div className="font-medium text-foreground">
 													Style Match
 												</div>
 												<div className="flex flex-wrap gap-1">
@@ -193,7 +181,7 @@ export function AnalyticsCard({
 															<Badge
 																key={index}
 																variant="outline"
-																className="text-xs bg-blue-100 text-blue-700 border-blue-300"
+																className="text-xs"
 															>
 																{style}
 															</Badge>
@@ -203,7 +191,7 @@ export function AnalyticsCard({
 														.length > 3 && (
 														<Badge
 															variant="outline"
-															className="text-xs bg-blue-100 text-blue-700 border-blue-300"
+															className="text-xs"
 														>
 															+
 															{userPreferences
@@ -218,13 +206,10 @@ export function AnalyticsCard({
 										)}
 									{userPreferences.bodyType && (
 										<div className="space-y-2">
-											<div className="font-medium text-blue-700">
+											<div className="font-medium text-foreground">
 												Body Type
 											</div>
-											<Badge
-												variant="outline"
-												className="bg-purple-100 text-purple-700 border-purple-300"
-											>
+											<Badge variant="outline">
 												{userPreferences.bodyType}
 											</Badge>
 										</div>
@@ -233,7 +218,7 @@ export function AnalyticsCard({
 										userPreferences.favoriteBrands.length >
 											0 && (
 											<div className="space-y-2">
-												<div className="font-medium text-blue-700">
+												<div className="font-medium text-foreground">
 													Favorite Brands
 												</div>
 												<div className="flex flex-wrap gap-1">
@@ -243,7 +228,7 @@ export function AnalyticsCard({
 															<Badge
 																key={index}
 																variant="outline"
-																className="text-xs bg-green-100 text-green-700 border-green-300"
+																className="text-xs"
 															>
 																{brand}
 															</Badge>
@@ -253,7 +238,7 @@ export function AnalyticsCard({
 														2 && (
 														<Badge
 															variant="outline"
-															className="text-xs bg-green-100 text-green-700 border-green-300"
+															className="text-xs"
 														>
 															+
 															{userPreferences
@@ -268,13 +253,10 @@ export function AnalyticsCard({
 										)}
 									{userPreferences.preferredCurrency && (
 										<div className="space-y-2">
-											<div className="font-medium text-blue-700">
+											<div className="font-medium text-foreground">
 												Currency
 											</div>
-											<Badge
-												variant="outline"
-												className="bg-amber-100 text-amber-700 border-amber-300"
-											>
+											<Badge variant="outline">
 												{
 													userPreferences.preferredCurrency
 												}
@@ -334,27 +316,27 @@ export function AnalyticsCard({
 									</Badge>
 								</div>
 								<div className="grid grid-cols-3 gap-2 text-xs">
-									<div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded">
-										<div className="font-bold text-green-700 dark:text-green-300">
+									<div className="text-center p-2 bg-chart-1/10 rounded">
+										<div className="font-bold text-chart-1">
 											{wearStats.wearFrequency.daily}
 										</div>
-										<div className="text-green-600 dark:text-green-400">
+										<div className="text-muted-foreground">
 											Daily
 										</div>
 									</div>
-									<div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
-										<div className="font-bold text-blue-700 dark:text-blue-300">
+									<div className="text-center p-2 bg-chart-2/10 rounded">
+										<div className="font-bold text-chart-2">
 											{wearStats.wearFrequency.weekly}
 										</div>
-										<div className="text-blue-600 dark:text-blue-400">
+										<div className="text-muted-foreground">
 											Weekly
 										</div>
 									</div>
-									<div className="text-center p-2 bg-purple-50 dark:bg-purple-900/20 rounded">
-										<div className="font-bold text-purple-700 dark:text-purple-300">
+									<div className="text-center p-2 bg-chart-3/10 rounded">
+										<div className="font-bold text-chart-3">
 											{wearStats.wearFrequency.monthly}
 										</div>
-										<div className="text-purple-600 dark:text-purple-400">
+										<div className="text-muted-foreground">
 											Monthly
 										</div>
 									</div>
@@ -366,59 +348,51 @@ export function AnalyticsCard({
 					<TabsContent value="categories" className="space-y-4 mt-4">
 						<div className="grid grid-cols-1 gap-3">
 							<StatItem
-								icon={
-									<User className="w-4 h-4 text-blue-600" />
-								}
+								icon={<User className="w-4 h-4 text-chart-1" />}
 								label="Tops"
 								value={categoryStats.tops}
-								color="blue"
 							/>
 							<StatItem
 								icon={
-									<Shield className="w-4 h-4 text-green-600" />
+									<Shield className="w-4 h-4 text-chart-2" />
 								}
 								label="Bottoms"
 								value={categoryStats.bottoms}
-								color="green"
 							/>
 							<StatItem
 								icon={
-									<Palette className="w-4 h-4 text-purple-600" />
+									<Palette className="w-4 h-4 text-chart-3" />
 								}
 								label="Dresses"
 								value={categoryStats.dresses}
-								color="purple"
 							/>
 							<StatItem
 								icon={
-									<Clock className="w-4 h-4 text-yellow-600" />
+									<Clock className="w-4 h-4 text-chart-4" />
 								}
 								label="Outerwear"
 								value={categoryStats.outerwear}
-								color="yellow"
 							/>
 							<StatItem
 								icon={
-									<TrendingUp className="w-4 h-4 text-orange-600" />
+									<TrendingUp className="w-4 h-4 text-chart-5" />
 								}
 								label="Shoes"
 								value={categoryStats.shoes}
-								color="orange"
 							/>
 							<StatItem
 								icon={
-									<Sparkles className="w-4 h-4 text-pink-600" />
+									<Sparkles className="w-4 h-4 text-primary" />
 								}
 								label="Accessories"
 								value={categoryStats.accessories}
-								color="pink"
 							/>
 						</div>
 					</TabsContent>
 
 					<TabsContent value="usage" className="space-y-4 mt-4">
 						<div className="space-y-3">
-							<div className="p-4 rounded-lg border bg-background/50 dark:bg-gray-900/50">
+							<div className="p-4 rounded-lg border bg-card">
 								<div className="flex items-center justify-between mb-2">
 									<span className="text-sm font-medium">
 										Most Worn Item
@@ -437,7 +411,7 @@ export function AnalyticsCard({
 								</p>
 							</div>
 
-							<div className="p-4 rounded-lg border bg-background/50 dark:bg-gray-900/50">
+							<div className="p-4 rounded-lg border bg-card">
 								<div className="flex items-center justify-between mb-2">
 									<span className="text-sm font-medium">
 										Least Worn Item
@@ -459,20 +433,18 @@ export function AnalyticsCard({
 
 							<StatItem
 								icon={
-									<TrendingUp className="w-4 h-4 text-orange-600" />
+									<TrendingUp className="w-4 h-4 text-chart-1" />
 								}
 								label="Total Wears"
 								value={wearStats.totalWorn}
-								color="orange"
 							/>
 
 							<StatItem
 								icon={
-									<Scale className="w-4 h-4 text-teal-600" />
+									<Scale className="w-4 h-4 text-chart-2" />
 								}
 								label="Average Wear"
 								value={wearStats.averageWear.toFixed(1)}
-								color="teal"
 								subtitle="Per item usage"
 							/>
 						</div>
@@ -485,14 +457,14 @@ export function AnalyticsCard({
 							</h4>
 							<div className="space-y-3">
 								{usageStats.costPerWear.mostEfficient ? (
-									<div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border">
+									<div className="p-3 rounded-lg bg-chart-1/10 border">
 										<div className="flex items-center justify-between mb-1 min-w-0">
-											<span className="text-sm font-medium text-green-700 dark:text-green-300 truncate">
+											<span className="text-sm font-medium text-chart-1 truncate">
 												Most Efficient
 											</span>
 											<Badge
 												variant="secondary"
-												className="bg-green-100 dark:bg-green-800 text-xs flex-shrink-0 ml-2"
+												className="text-xs flex-shrink-0 ml-2"
 											>
 												$
 												{(
@@ -509,7 +481,7 @@ export function AnalyticsCard({
 												/wear
 											</Badge>
 										</div>
-										<p className="text-xs text-green-600 dark:text-green-400 truncate">
+										<p className="text-xs text-muted-foreground truncate">
 											{getItemDisplayName(
 												usageStats.costPerWear
 													.mostEfficient
@@ -517,33 +489,33 @@ export function AnalyticsCard({
 										</p>
 									</div>
 								) : (
-									<div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/20 border">
+									<div className="p-3 rounded-lg bg-muted/50 border">
 										<div className="flex items-center justify-between mb-1 min-w-0">
-											<span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+											<span className="text-sm font-medium truncate">
 												Most Efficient
 											</span>
 											<Badge
 												variant="secondary"
-												className="bg-gray-100 dark:bg-gray-800 text-xs flex-shrink-0 ml-2"
+												className="text-xs flex-shrink-0 ml-2"
 											>
 												No data
 											</Badge>
 										</div>
-										<p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+										<p className="text-xs text-muted-foreground truncate">
 											No items with cost data
 										</p>
 									</div>
 								)}
 
 								{usageStats.costPerWear.leastEfficient ? (
-									<div className="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border">
+									<div className="p-3 rounded-lg bg-chart-5/10 border">
 										<div className="flex items-center justify-between mb-1 min-w-0">
-											<span className="text-sm font-medium text-orange-700 dark:text-orange-300 truncate">
+											<span className="text-sm font-medium text-chart-5 truncate">
 												Needs More Love
 											</span>
 											<Badge
 												variant="outline"
-												className="bg-orange-100 dark:bg-orange-800 text-xs flex-shrink-0 ml-2"
+												className="text-xs flex-shrink-0 ml-2"
 											>
 												$
 												{(
@@ -560,7 +532,7 @@ export function AnalyticsCard({
 												/wear
 											</Badge>
 										</div>
-										<p className="text-xs text-orange-600 dark:text-orange-400 truncate">
+										<p className="text-xs text-muted-foreground truncate">
 											{getItemDisplayName(
 												usageStats.costPerWear
 													.leastEfficient
@@ -568,19 +540,19 @@ export function AnalyticsCard({
 										</p>
 									</div>
 								) : (
-									<div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/20 border">
+									<div className="p-3 rounded-lg bg-muted/50 border">
 										<div className="flex items-center justify-between mb-1 min-w-0">
-											<span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+											<span className="text-sm font-medium truncate">
 												Needs More Love
 											</span>
 											<Badge
 												variant="outline"
-												className="bg-gray-100 dark:bg-gray-800 text-xs flex-shrink-0 ml-2"
+												className="text-xs flex-shrink-0 ml-2"
 											>
 												No data
 											</Badge>
 										</div>
-										<p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+										<p className="text-xs text-muted-foreground truncate">
 											No items with cost data
 										</p>
 									</div>
@@ -596,7 +568,7 @@ export function AnalyticsCard({
 						<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
 							<StatItem
 								icon={
-									<DollarSign className="w-4 h-4 text-emerald-600" />
+									<DollarSign className="w-4 h-4 text-chart-1" />
 								}
 								label="Total Investment"
 								value={`$${
@@ -609,29 +581,24 @@ export function AnalyticsCard({
 												0
 											)
 								}`}
-								color="emerald"
 								subtitle="Your wardrobe value"
 							/>
 							<StatItem
 								icon={
-									<Heart className="w-4 h-4 text-pink-600" />
+									<Heart className="w-4 h-4 text-chart-2" />
 								}
 								label="Avg Item Cost"
 								value={`$${sustainabilityStats.averageCostPerItem.toFixed(0)}`}
-								color="pink"
 								subtitle="Average purchase price"
 							/>
 							<StatItem
-								icon={
-									<Leaf className="w-4 h-4 text-green-600" />
-								}
+								icon={<Leaf className="w-4 h-4 text-chart-3" />}
 								label="Sustainability Score"
 								value={`${sustainabilityStats.sustainabilityScore.toFixed(0)}%`}
-								color="green"
 								subtitle="Environmental impact rating"
 							/>
 							<StatItem
-								icon={<Zap className="w-4 h-4 text-blue-600" />}
+								icon={<Zap className="w-4 h-4 text-chart-4" />}
 								label="CO₂ Saved"
 								value={`${
 									sustainabilityStats.co2SavedFromRewearing >=
@@ -644,7 +611,6 @@ export function AnalyticsCard({
 												0
 											) + "kg"
 								}`}
-								color="blue"
 								subtitle="From re-wearing items"
 							/>
 						</div>
@@ -662,12 +628,6 @@ export function AnalyticsCard({
 											? "default"
 											: "secondary"
 									}
-									className={
-										sustainabilityStats.sustainabilityScore >=
-										70
-											? "bg-green-600"
-											: ""
-									}
 								>
 									{sustainabilityStats.sustainabilityScore >=
 									70
@@ -680,15 +640,7 @@ export function AnalyticsCard({
 							</div>
 							<div className="w-full bg-muted rounded-full h-3">
 								<div
-									className={`h-3 rounded-full transition-all ${
-										sustainabilityStats.sustainabilityScore >=
-										70
-											? "bg-gradient-to-r from-green-500 to-emerald-500"
-											: sustainabilityStats.sustainabilityScore >=
-												  50
-												? "bg-gradient-to-r from-yellow-400 to-orange-500"
-												: "bg-gradient-to-r from-red-400 to-orange-500"
-									}`}
+									className="h-3 rounded-full transition-all bg-gradient-to-r from-primary to-chart-1"
 									style={{
 										width: `${Math.min(sustainabilityStats.sustainabilityScore, 100)}%`,
 									}}
@@ -713,8 +665,8 @@ export function AnalyticsCard({
 								Environmental Impact
 							</h4>
 							<div className="grid grid-cols-2 gap-3">
-								<div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border min-w-0">
-									<div className="text-base sm:text-lg font-bold text-green-700 dark:text-green-300 break-words">
+								<div className="text-center p-3 bg-chart-1/10 rounded-lg border min-w-0">
+									<div className="text-base sm:text-lg font-bold text-chart-1 break-words">
 										{(() => {
 											const co2Value = Math.max(
 												0,
@@ -726,18 +678,18 @@ export function AnalyticsCard({
 											return `${co2Value.toFixed(0)}kg`;
 										})()}
 									</div>
-									<p className="text-xs text-green-600 dark:text-green-400">
+									<p className="text-xs text-muted-foreground">
 										CO₂ Prevented
 									</p>
 								</div>
-								<div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border min-w-0">
-									<div className="text-base sm:text-lg font-bold text-blue-700 dark:text-blue-300 break-words">
+								<div className="text-center p-3 bg-chart-2/10 rounded-lg border min-w-0">
+									<div className="text-base sm:text-lg font-bold text-chart-2 break-words">
 										{Math.floor(
 											sustainabilityStats.co2SavedFromRewearing /
 												33
 										)}
 									</div>
-									<p className="text-xs text-blue-600 dark:text-blue-400">
+									<p className="text-xs text-muted-foreground">
 										Items Not Bought
 									</p>
 								</div>

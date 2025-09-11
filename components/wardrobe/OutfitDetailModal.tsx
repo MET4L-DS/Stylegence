@@ -363,7 +363,7 @@ export function OutfitDetailModal({
 									<Button
 										size="sm"
 										onClick={() => setShowSaveDialog(true)}
-										className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+										className="bg-gradient-to-r from-primary to-chart-5 hover:from-primary/90 hover:to-chart-5/90"
 									>
 										<Heart className="w-4 h-4 mr-2" />
 										<span className="hidden sm:inline">
@@ -375,7 +375,7 @@ export function OutfitDetailModal({
 								{context !== "saved" && isOutfitSaved && (
 									<Badge
 										variant="secondary"
-										className="bg-green-100 text-green-700"
+										className="bg-chart-2/10 text-chart-2 border-chart-2/20"
 									>
 										<Check className="w-3 h-3 mr-1" />
 										Saved
@@ -466,7 +466,7 @@ export function OutfitDetailModal({
 																					key={
 																						colorIndex
 																					}
-																					className="w-4 h-4 rounded-full border-2 border-gray-200 shadow-sm"
+																					className="w-4 h-4 rounded-full border-2 border-border shadow-sm"
 																					style={{
 																						backgroundColor:
 																							color,
@@ -569,8 +569,8 @@ export function OutfitDetailModal({
 										{totalCost > 0 && (
 											<Card className="hover:shadow-md transition-shadow">
 												<CardContent className="p-3 sm:p-6 text-center">
-													<DollarSign className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-green-600" />
-													<div className="text-xl sm:text-3xl font-bold text-green-600">
+													<DollarSign className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-chart-1" />
+													<div className="text-xl sm:text-3xl font-bold text-chart-1">
 														${totalCost}
 													</div>
 													<div className="text-xs sm:text-sm text-muted-foreground">
@@ -582,8 +582,8 @@ export function OutfitDetailModal({
 										{sustainabilityScore > 0 && (
 											<Card className="hover:shadow-md transition-shadow">
 												<CardContent className="p-3 sm:p-6 text-center">
-													<Leaf className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-green-600" />
-													<div className="text-xl sm:text-3xl font-bold text-green-600">
+													<Leaf className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-chart-2" />
+													<div className="text-xl sm:text-3xl font-bold text-chart-2">
 														{sustainabilityScore}%
 													</div>
 													<div className="text-xs sm:text-sm text-muted-foreground">
@@ -595,8 +595,8 @@ export function OutfitDetailModal({
 										{comfortLevel > 0 && (
 											<Card className="hover:shadow-md transition-shadow">
 												<CardContent className="p-3 sm:p-6 text-center">
-													<Star className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-yellow-500" />
-													<div className="text-xl sm:text-3xl font-bold text-yellow-600">
+													<Star className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-chart-3" />
+													<div className="text-xl sm:text-3xl font-bold text-chart-3">
 														{comfortLevel}/10
 													</div>
 													<div className="text-xs sm:text-sm text-muted-foreground">
@@ -608,8 +608,8 @@ export function OutfitDetailModal({
 										{avgWearCount > 0 && (
 											<Card className="hover:shadow-md transition-shadow">
 												<CardContent className="p-3 sm:p-6 text-center">
-													<TrendingUp className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-blue-600" />
-													<div className="text-xl sm:text-3xl font-bold text-blue-600">
+													<TrendingUp className="w-6 sm:w-8 h-6 sm:h-8 mx-auto mb-2 sm:mb-3 text-chart-4" />
+													<div className="text-xl sm:text-3xl font-bold text-chart-4">
 														{avgWearCount.toFixed(
 															1
 														)}
