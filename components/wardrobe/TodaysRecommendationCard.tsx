@@ -174,7 +174,7 @@ export function TodaysRecommendationCard({
 				<div className="absolute top-4 left-4 z-10">
 					<Badge
 						variant="secondary"
-						className="bg-chart-5/10 text-chart-5 border-chart-5/20 text-xs"
+						className="bg-accent text-accent-foreground border-accent/20 text-xs font-medium"
 					>
 						<Brain className="w-3 h-3 mr-1" />
 						AI Curated
@@ -325,14 +325,14 @@ export function TodaysRecommendationCard({
 
 					{/* AI Insights */}
 					{isAIGenerated && (
-						<div className="bg-chart-5/10 rounded-lg p-4 border border-chart-5/20">
+						<div className="bg-accent/20 rounded-lg p-4 border border-accent/30">
 							<div className="flex items-center gap-2 mb-3">
-								<Brain className="w-4 h-4 text-chart-5" />
-								<h4 className="text-sm font-semibold text-chart-5">
+								<Brain className="w-4 h-4 text-accent-foreground" />
+								<h4 className="text-sm font-semibold text-accent-foreground">
 									AI Styling Notes
 								</h4>
 							</div>
-							<div className="space-y-2 text-sm text-chart-5">
+							<div className="space-y-2 text-sm text-foreground">
 								<p>
 									• Perfect for {metadata.occasion} occasions
 								</p>
