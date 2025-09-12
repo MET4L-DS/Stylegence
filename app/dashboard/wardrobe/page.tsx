@@ -114,10 +114,11 @@ export default function WardrobePage() {
 	}
 
 	return (
-		<div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
-			{/* Welcome Section with Today's Outfit */}
-			<div className="mb-8">
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+		<div className="flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6">
+			{/* Hero Section - 2D Grid Layout */}
+			<div className="hero-grid">
+				{/* Welcome Section - Spans 2 columns on large screens */}
+				<div className="welcome-area">
 					<WelcomeSection
 						userName={
 							convexUser?.username ||
@@ -126,125 +127,143 @@ export default function WardrobePage() {
 							"there"
 						}
 						subtitle="Manage your wardrobe and create amazing outfits tailored to your style."
-					>
-						<div className="mb-6">
-							<div className="flex items-center gap-2 mb-3">
-								<Calendar className="w-4 h-4 text-muted-foreground" />
-								<span className="text-sm font-medium text-muted-foreground">
-									View outfit for:
-								</span>
-							</div>
-							<div className="flex flex-wrap gap-2">
-								{[
-									"Monday",
-									"Tuesday",
-									"Wednesday",
-									"Thursday",
-									"Friday",
-									"Saturday",
-									"Sunday",
-								].map((day) => (
-									<Button
-										key={day}
-										variant={
-											selectedDay === day
-												? "default"
-												: "outline"
-										}
-										size="sm"
-										onClick={() => setSelectedDay(day)}
-									>
-										{day}
-									</Button>
-								))}
-							</div>
-						</div>
-						<TodaysRecommendationCard
-							selectedDay={selectedDay}
-							userPreferences={convexUser}
-						/>
-					</WelcomeSection>
+					/>
+				</div>
 
-					{/* Compact Analytics */}
-					<div className="space-y-4">
-						<AnalyticsCard
-							wardrobeItems={wardrobeItems}
-							userPreferences={convexUser}
-						/>
-						<WeeklyProgress />
+				{/* Day Selector - Full width bar */}
+				<div className="day-selector-area">
+					<div className="bg-card border rounded-lg p-4">
+						<div className="flex items-center gap-2 mb-3">
+							<Calendar className="w-4 h-4 text-muted-foreground" />
+							<span className="text-sm font-medium text-muted-foreground">
+								View outfit for:
+							</span>
+						</div>
+						<div className="flex flex-wrap gap-2">
+							{[
+								"Monday",
+								"Tuesday",
+								"Wednesday",
+								"Thursday",
+								"Friday",
+								"Saturday",
+								"Sunday",
+							].map((day) => (
+								<Button
+									key={day}
+									variant={
+										selectedDay === day
+											? "default"
+											: "outline"
+									}
+									size="sm"
+									onClick={() => setSelectedDay(day)}
+									className="min-w-[80px]"
+								>
+									{day}
+								</Button>
+							))}
+						</div>
 					</div>
+				</div>
+
+				{/* Today's Recommendation - Large card */}
+				<div className="recommendation-area">
+					<TodaysRecommendationCard
+						selectedDay={selectedDay}
+						userPreferences={convexUser}
+					/>
+				</div>
+
+				{/* Analytics Card - Right column */}
+				<div className="analytics-area">
+					<AnalyticsCard
+						wardrobeItems={wardrobeItems}
+						userPreferences={convexUser}
+					/>
+				</div>
+
+				{/* Weekly Progress - Bottom right */}
+				<div className="progress-area">
+					<WeeklyProgress />
 				</div>
 			</div>
 
 			{/* Wardrobe Management */}
-			<Tabs
-				value={activeTab}
-				onValueChange={setActiveTab}
-				className="space-y-6"
-			>
-				<div className="flex justify-between items-center">
-					<TabsList>
-						<TabsTrigger value="all">All Items</TabsTrigger>
-						<TabsTrigger value="outfits">Saved Outfits</TabsTrigger>
-						<TabsTrigger value="weekly">Weekly Planner</TabsTrigger>
-						<TabsTrigger value="wishlist">Wishlist</TabsTrigger>
-					</TabsList>
+			<div className="mt-8">
+				<Tabs
+					value={activeTab}
+					onValueChange={setActiveTab}
+					className="space-y-6"
+				>
+					<div className="flex justify-between items-center">
+						<TabsList>
+							<TabsTrigger value="all">All Items</TabsTrigger>
+							<TabsTrigger value="outfits">
+								Saved Outfits
+							</TabsTrigger>
+							<TabsTrigger value="weekly">
+								Weekly Planner
+							</TabsTrigger>
+							<TabsTrigger value="wishlist">Wishlist</TabsTrigger>
+						</TabsList>
 
-					<div className="flex gap-3 items-center">
-						{/* Debug Info */}
-						{wardrobeSummary && (
-							<div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-								Items: {wardrobeSummary.totalItems} | IDs:{" "}
-								{wardrobeSummary.userWardrobeItemIdsCount} |
-								{wardrobeSummary.itemsMatch ? " ✓" : " ❌"}
-							</div>
-						)}
+						<div className="flex gap-3 items-center">
+							{/* Debug Info */}
+							{wardrobeSummary && (
+								<div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+									Items: {wardrobeSummary.totalItems} | IDs:{" "}
+									{wardrobeSummary.userWardrobeItemIdsCount} |
+									{wardrobeSummary.itemsMatch ? " ✓" : " ❌"}
+								</div>
+							)}
 
-						<Button onClick={() => setIsAddItemModalOpen(true)}>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Item
-						</Button>
-					</div>
-				</div>
-
-				<TabsContent value="all" className="space-y-6">
-					<CategoryFilter
-						selectedCategory={selectedCategory}
-						onCategorySelect={setSelectedCategory}
-						categories={categories}
-					/>
-
-					{transformedWardrobeItems.length === 0 ? (
-						<div className="space-y-8">
-							<div className="text-center py-12">
-								<h3 className="text-lg font-semibold mb-2">
-									Your wardrobe is empty
-								</h3>
-								<p className="text-muted-foreground mb-6">
-									Start by uploading sample items or adding
-									your own clothing pieces
-								</p>
-							</div>
-							<WardrobeMigrationPanel />
+							<Button onClick={() => setIsAddItemModalOpen(true)}>
+								<Plus className="w-4 h-4 mr-2" />
+								Add Item
+							</Button>
 						</div>
-					) : (
-						<WardrobeGrid items={filteredItems} />
-					)}
-				</TabsContent>
+					</div>
 
-				<TabsContent value="outfits" className="space-y-6">
-					<OutfitGrid />
-				</TabsContent>
+					<TabsContent value="all" className="space-y-6">
+						<CategoryFilter
+							selectedCategory={selectedCategory}
+							onCategorySelect={setSelectedCategory}
+							categories={categories}
+						/>
 
-				<TabsContent value="weekly" className="space-y-6">
-					<WeeklyOverview />
-					<WeeklyPlanGrid />
-				</TabsContent>
+						{transformedWardrobeItems.length === 0 ? (
+							<div className="space-y-8">
+								<div className="text-center py-12">
+									<h3 className="text-lg font-semibold mb-2">
+										Your wardrobe is empty
+									</h3>
+									<p className="text-muted-foreground mb-6">
+										Start by uploading sample items or
+										adding your own clothing pieces
+									</p>
+								</div>
+								<WardrobeMigrationPanel />
+							</div>
+						) : (
+							<WardrobeGrid items={filteredItems} />
+						)}
+					</TabsContent>
 
-				<TabsContent value="wishlist" className="space-y-6">
-					<EmptyWishlist />
-				</TabsContent>
-			</Tabs>
+					<TabsContent value="outfits" className="space-y-6">
+						<OutfitGrid />
+					</TabsContent>
+
+					<TabsContent value="weekly" className="space-y-6">
+						<WeeklyOverview />
+						<WeeklyPlanGrid />
+					</TabsContent>
+
+					<TabsContent value="wishlist" className="space-y-6">
+						<EmptyWishlist />
+					</TabsContent>
+				</Tabs>
+			</div>
 
 			{/* Add Item Modal */}
 			<AddItemModal

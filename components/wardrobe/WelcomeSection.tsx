@@ -1,7 +1,7 @@
 interface WelcomeSectionProps {
 	userName?: string;
 	subtitle?: string;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 }
 
 export function WelcomeSection({
@@ -10,11 +10,11 @@ export function WelcomeSection({
 	children,
 }: WelcomeSectionProps) {
 	return (
-		<div className="lg:col-span-2">
+		<div className="bg-card border rounded-lg p-6">
 			<h2 className="text-3xl font-bold text-foreground mb-2">
 				Welcome back, {userName}!
 			</h2>
-			<p className="text-muted-foreground mb-6">{subtitle}</p>
+			<p className="text-muted-foreground mb-4">{subtitle}</p>
 			{children}
 		</div>
 	);
